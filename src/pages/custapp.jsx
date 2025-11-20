@@ -1,5 +1,6 @@
+// src/pages/Custapp.jsx   (or Booking.jsx, whatever you named it)
 import React, { useState } from "react";
-import { Bell } from "lucide-react";
+import CustomerLayout from "../layout/customerLayout"; // ← Your shared layout
 import logo from "../assets/logos.png";
 
 const Custapp = () => {
@@ -8,7 +9,7 @@ const Custapp = () => {
     time: "10:30",
     services: ["Haircut & Styling", "Manicure / Pedicure"],
     staff: "Anna (preferred)",
-    recurrence: "None", // Changed to match screenshot
+    recurrence: "None",
     smsReminder: true,
     agree: false,
   });
@@ -39,7 +40,6 @@ const Custapp = () => {
       year: "numeric",
     });
 
-  // Format recurrence to match screenshot
   const formatRecurrence = () => {
     if (formData.recurrence === "None") return "None — One-time appointment";
     if (formData.recurrence === "Weekly") return "Weekly — Every Sat (4x)";
@@ -47,232 +47,205 @@ const Custapp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
-      {/* HEADER */}
-      <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e]">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src={logo}
-              alt="Honey Dolls Logo"
-              className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-            <div>
-              <h1 className="text-xl font-bold text-orange-900">
-                Honey Dolls & Brilliant
-              </h1>
-              <p className="text-sm text-orange-800 font-medium">
-                Beauty Hub — Davao
-              </p>
-            </div>
+    <CustomerLayout>
+      {/* MAIN CONTENT — starts below fixed navbar */}
+      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 pt-20 pb-12">
+        <div className="max-w-7xl mx-auto px-6 py-10">
+
+          {/* Page Title */}
+          <div className="mb-10 text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold text-orange-900">
+              Book Your Appointment
+            </h1>
+            <p className="text-lg text-gray-700 mt-3">
+              Choose your preferred date, time, and services
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Bell className="w-6 h-6 text-yellow-600" />
-            <span className="text-orange-900 font-medium text-sm hidden sm:inline">
-              Welcome, Keoski <span className="text-yellow-600">Hand Wave</span>
-            </span>
-          </div>
-        </div>
-      </header>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 px-6 py-10">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          {/* LEFT FORM - 2/3 width */}
-          <section className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-6">
-              Schedule Your Visit
-            </h2>
+          {/* Two-column layout */}
+          <div className="grid md:grid-cols-3 gap-8">
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {/* Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Date
-                </label>
-                <select
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
-                >
-                  <option value="2025-10-25">Oct 25, 2025</option>
-                  {/* Add more dates as needed */}
-                </select>
-              </div>
+            {/* LEFT: Booking Form */}
+            <section className="md:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-8">
+                Schedule Your Visit
+              </h2>
 
-              {/* Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Time
-                </label>
-                <select
-                  name="time"
-                  value={formData.time}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
-                >
-                  <option value="10:30">10:30 AM</option>
-                  {/* Add more times */}
-                </select>
-              </div>
-            </div>
-
-            {/* Services */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Choose Services
-              </label>
-              <div className="space-y-2">
-                {servicesList.map((service) => (
-                  <label key={service} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={formData.services.includes(service)}
-                      onChange={() => toggleService(service)}
-                      className="w-4 h-4 text-orange-500 rounded"
-                    />
-                    {service}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Date */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Preferred Date
                   </label>
-                ))}
-              </div>
-            </div>
+                  <select
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:border-orange-400 focus:outline-none shadow-sm"
+                  >
+                    <option value="2025-10-25">Oct 25, 2025</option>
+                    <option value="2025-10-26">Oct 26, 2025</option>
+                    <option value="2025-10-27">Oct 27, 2025</option>
+                  </select>
+                </div>
 
-            {/* Staff & Recurrence */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preferred Staff
+                {/* Time */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Preferred Time
+                  </label>
+                  <select
+                    name="time"
+                    value={formData.time}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:border-orange-400 focus:outline-none shadow-sm"
+                  >
+                    <option value="10:30">10:30 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="14:00">2:00 PM</option>
+                    <option value="16:00">4:00 PM</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Services */}
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-4">
+                  Choose Services
                 </label>
-                <select
-                  name="staff"
-                  value={formData.staff}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
-                >
-                  <option>Select Staff</option>
-                  <option>Anna (preferred)</option>
-                  <option>Mariel</option>
-                  <option>Jessa</option>
-                </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {servicesList.map((service) => (
+                    <label
+                      key={service}
+                      className="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-200 cursor-pointer hover:bg-orange-100 transition"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.services.includes(service)}
+                        onChange={() => toggleService(service)}
+                        className="w-5 h-5 text-orange-600 rounded focus:ring-orange-400"
+                      />
+                      <span className="font-medium text-gray-800">{service}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Recurrence
+              {/* Staff & Recurrence */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Preferred Staff
+                  </label>
+                  <select
+                    name="staff"
+                    value={formData.staff}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:border-orange-400 focus:outline-none shadow-sm"
+                  >
+                    <option>Select Staff</option>
+                    <option>Anna (preferred)</option>
+                    <option>Mariel</option>
+                    <option>Jessa</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Recurrence
+                  </label>
+                  <select
+                    name="recurrence"
+                    value={formData.recurrence}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:border-orange-400 focus:outline-none shadow-sm"
+                  >
+                    <option value="None">None</option>
+                    <option value="Weekly">Weekly — Every week</option>
+                    <option value="Monthly">Monthly — Same day each month</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Checkboxes */}
+              <div className="space-y-4 text-sm">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="smsReminder"
+                    checked={formData.smsReminder}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-orange-600 rounded"
+                  />
+                  <span className="text-gray-700">Send SMS reminder 24 hours before</span>
                 </label>
-                <select
-                  name="recurrence"
-                  value={formData.recurrence}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
-                >
-                  <option value="None">None</option>
-                  <option value="Daily">Daily — Every day at chosen time</option>
-                  <option value="Weekly">Weekly — Every week (e.g. Saturday)</option>
-                  <option value="Monthly">Monthly — Same day each month</option>
-                  <option value="Custom">Custom — Repeat N times</option>
-                </select>
+
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="agree"
+                    checked={formData.agree}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-orange-600 rounded"
+                  />
+                  <span className="text-gray-700">I agree to the salon policies and cancellation terms</span>
+                </label>
               </div>
-            </div>
+            </section>
 
-            {/* Repeat Options Info */}
-            <div className="bg-orange-50 border border-orange-200 text-sm text-gray-700 p-4 rounded-lg mb-6">
-              <p className="font-semibold mb-1">Repeat options</p>
-              <ul className="list-disc list-inside space-y-0.5 text-xs">
-                <li>None — One-time appointment</li>
-                <li>Daily — Every day at chosen time</li>
-                <li>Weekly — Every week (e.g. Saturday)</li>
-                <li>Monthly — Same day each month</li>
-                <li>Custom — Repeat N times</li>
-              </ul>
-            </div>
+            {/* RIGHT: Appointment Summary — sticky & always visible */}
+            <aside className="bg-white rounded-2xl shadow-xl border border-pink-100 p-8 h-fit sticky top-24">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Appointment Summary
+              </h2>
 
-            {/* Checkboxes */}
-            <div className="flex flex-col sm:flex-row gap-4 text-sm">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="smsReminder"
-                  checked={formData.smsReminder}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-orange-500 rounded"
-                />
-                Send SMS reminder (24h before)
-              </label>
+              <div className="space-y-4 text-gray-700">
+                <div>
+                  <p className="text-sm text-gray-500">Services</p>
+                  <p className="font-semibold">{formData.services.join(", ")}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="font-semibold">{formatDate(formData.date)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Time</p>
+                  <p className="font-semibold">{formData.time} AM</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Staff</p>
+                  <p className="font-semibold">{formData.staff}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Recurrence</p>
+                  <p className="font-semibold text-sm">{formatRecurrence()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Branch</p>
+                  <p className="font-semibold">Gaisano Mall of Davao</p>
+                </div>
+              </div>
 
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="agree"
-                  checked={formData.agree}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-orange-500 rounded"
-                />
-                Agree to policies
-              </label>
-            </div>
-          </section>
+              <div className="mt-8 pt-6 border-t-2 border-pink-100">
+                <p className="text-right text-3xl font-bold text-orange-900">
+                  ₱1,200
+                </p>
+                <p className="text-right text-sm text-gray-600">Estimated Total</p>
+              </div>
 
-          {/* RIGHT SUMMARY - STICKY & FIXED WIDTH */}
-          <aside className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 h-fit sticky top-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Appointment Summary
-            </h2>
-
-            <div className="space-y-2 text-sm text-gray-700">
-              <p>
-                <strong>Service(s):</strong>{" "}
-                {formData.services.join(", ")}
-              </p>
-              <p>
-                <strong>Date:</strong> {formatDate(formData.date)}
-              </p>
-              <p>
-                <strong>Time:</strong> {formData.time} AM
-              </p>
-              <p>
-                <strong>Staff:</strong> {formData.staff}
-              </p>
-              <p>
-                <strong>Recurrence:</strong> {formatRecurrence()}
-              </p>
-              <p>
-                <strong>Branch:</strong> Gaisano Mall of Davao
-              </p>
-              <p>
-                <strong>Reminder:</strong> SMS 24h before
-              </p>
-              <p>
-                <strong>Notes:</strong> No metallic hair products
-              </p>
-              <p className="font-semibold text-right text-gray-800 mt-4 pt-2 border-t border-gray-200">
-                Estimated Total:{" "}
-                <span className="text-gray-900 font-bold text-lg">₱1,200</span>
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-3">
-              <button className="w-full py-2.5 rounded-md bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-medium shadow-sm hover:shadow-md transition-all">
-                Edit Details
-              </button>
-              <button className="w-full py-2.5 rounded-md bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-all">
-                Finalize Booking
-              </button>
-            </div>
-          </aside>
+              <div className="mt-8 space-y-4">
+                <button className="w-full bg-gradient-to-r from-[#FFD36E] to-[#F59E9E] text-white font-bold py-4 rounded-full shadow-lg hover:shadow-xl transition text-lg">
+                  Confirm Booking
+                </button>
+                <button className="w-full bg-gray-100 text-gray-700 font-medium py-3 rounded-full hover:bg-gray-200 transition">
+                  Save as Draft
+                </button>
+              </div>
+            </aside>
+          </div>
         </div>
       </main>
-
-      {/* FOOTER */}
-      <footer className="bg-white/80 py-3 border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-xs text-gray-600 text-center">
-            Honey Dolls • Brilliant Beauty Hub — Davao | Open Daily 9:00AM–9:00PM | Call (0934) 912 6618
-          </p>
-        </div>
-      </footer>
-    </div>
+    </CustomerLayout>
   );
 };
 
