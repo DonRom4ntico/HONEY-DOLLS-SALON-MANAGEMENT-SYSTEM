@@ -78,23 +78,39 @@ export default function MyAppointment() {
             </div>
           </div>
 
-          {/* Main Card */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+          {/* Filters - Responsive */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {["All", "Upcoming", "Pending", "Completed", "Cancelled"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-6 py-3 rounded-full font-medium text-sm transition-all shadow-sm ${
+                  filterStatus === status
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
 
+          {/* Desktop: Your Original Perfect Layout */}
+          <div className="hidden md:block bg-white rounded-3xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="px-10 py-6 border-b border-gray-200">
               <div className="flex items-center text-sm font-bold text-gray-600 uppercase tracking-wider">
-                <div className="w-28 text-left">ID</div>
-                <div className="w-40 text-left">Date</div>
-                <div className="w-52 text-left">Time</div>
-                <div className="w-36 text-left">Staff</div>
-                <div className="flex-1 text-left">Service(s)</div>
+                <div className="w-28">ID</div>
+                <div className="w-40">Date</div>
+                <div className="w-52">Time</div>
+                <div className="w-36">Staff</div>
+                <div className="flex-1">Service(s)</div>
                 <div className="w-40 text-center">Status</div>
                 <div className="w-64 text-center">Action</div>
               </div>
             </div>
 
-            {/* Rows – Perfectly Clean Alignment */}
+            {/* Desktop Rows */}
             <div className="divide-y divide-gray-100">
               {filteredAppointments.length === 0 ? (
                 <div className="text-center py-20 text-gray-500 text-xl">No appointments found</div>
@@ -106,54 +122,34 @@ export default function MyAppointment() {
                       apt.status === "Completed" ? "bg-teal-50" : "bg-amber-50"
                     }`}
                   >
-                    {/* ID */}
                     <div className="w-28 font-bold text-orange-800">#{apt.id}</div>
-
-                    {/* Date */}
                     <div className="w-40 flex items-center gap-3">
                       <Calendar className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-800">{apt.date}</span>
                     </div>
-
-                    {/* Time */}
                     <div className="w-52 flex items-center gap-3">
                       <Clock className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-800">{apt.time}</span>
                     </div>
-
-                    {/* Staff */}
                     <div className="w-36 flex items-center gap-3">
                       <User className="w-5 h-5 text-gray-600" />
                       <span className="font-medium text-gray-800">{apt.staff}</span>
                     </div>
-
-                    {/* Services – Clean pills */}
-                    <div className="flex-1 flex items-center gap-2 flex-wrap">
-                      {apt.services.map((service, i) => (
-                        <span
-                          key={i}
-                          className="px-4 py-2 bg-white text-gray-700 text-xs font-medium rounded-full border border-gray-300 shadow-sm whitespace-nowrap"
-                        >
-                          {service}
+                    <div className="flex-1 flex gap-2 flex-wrap">
+                      {apt.services.map((s, i) => (
+                        <span key={i} className="px-4 py-2 bg-white text-gray-700 text-xs font-medium rounded-full border border-gray-300 shadow-sm">
+                          {s}
                         </span>
                       ))}
                     </div>
-
-                    {/* Status – Perfectly centered */}
                     <div className="w-40 flex justify-center">
                       <div className="flex items-center gap-2">
-                        {apt.status === "Completed" ? (
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <AlertCircle className="w-5 h-5 text-orange-600" />
-                        )}
+                        {apt.status === "Completed" ? <CheckCircle className="w-5 h-5 text-green-600" /> : <AlertCircle className="w-5 h-5 text-orange-600" />}
                         <span className={`font-bold ${apt.status === "Completed" ? "text-green-700" : "text-orange-700"}`}>
                           {apt.status}
                         </span>
                       </div>
                     </div>
-
-                    {/* Action – Clean, spacious, perfectly centered */}
                     <div className="w-64 flex justify-center gap-4">
                       {canModify(apt.status) && (
                         <>
@@ -170,24 +166,81 @@ export default function MyAppointment() {
                 ))
               )}
             </div>
+          </div>
 
-            {/* Filters */}
-            <div className="flex justify-center gap-4 px-8 py-6 bg-gray-50 flex-wrap">
-              {["All", "Upcoming", "Pending", "Completed", "Cancelled"].map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-8 py-3 rounded-full font-medium text-sm transition-all shadow-sm ${
-                    filterStatus === status
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          {/* Mobile: Beautiful Stacked Cards */}
+          <div className="md: space-y-6">
+            {filteredAppointments.length === 0 ? (
+              <div className="text-center py-20 text-gray-500 text-xl bg-white rounded-3xl shadow-lg">
+                No appointments found
+              </div>
+            ) : (
+              filteredAppointments.map((apt) => (
+                <div
+                  key={apt.id}
+                  className={`bg-white rounded-3xl shadow-lg overflow-hidden ${
+                    apt.status === "Completed" ? "ring-2 ring-teal-200" : "ring-2 ring-amber-200"
                   }`}
                 >
-                  {status}
-                </button>
-              ))}
-            </div>
+                  <div className={`px-8 py-6 ${apt.status === "Completed" ? "bg-teal-50" : "bg-amber-50"}`}>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <div className="text-2xl font-bold text-orange-800">#{apt.id}</div>
+                        <div className="flex items-center gap-2 mt-2">
+                          {apt.status === "Completed" ? (
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <AlertCircle className="w-5 h-5 text-orange-600" />
+                          )}
+                          <span className={`font-bold text-lg ${apt.status === "Completed" ? "text-green-700" : "text-orange-700"}`}>
+                            {apt.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 text-gray-700">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-5 h-5 text-gray-500" />
+                        <span className="font-medium">{apt.date}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-gray-500" />
+                        <span className="font-medium">{apt.time}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <User className="w-5 h-5 text-gray-500" />
+                        <span className="font-medium">{apt.staff}</span>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600 mb-2">Services</p>
+                        <div className="flex flex-wrap gap-2">
+                          {apt.services.map((s, i) => (
+                            <span key={i} className="px-4 py-2 bg-white text-gray-700 text-xs font-medium rounded-full border border-gray-300 shadow-sm">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {canModify(apt.status) && (
+                        <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
+                          <button className="flex-1 py-3 bg-gradient-to-r from-[#FFD36E] to-[#F59E9E] text-white font-bold rounded-full hover:shadow-lg transition">
+                            Reschedule
+                          </button>
+                          <button className="flex-1 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition">
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
+
         </div>
       </main>
     </CustomerLayout>

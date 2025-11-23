@@ -47,8 +47,7 @@ export default function AdminLayout({ children, title }) {
   const isReturnedProductsActive = ['/customerReturnedProducts', '/supplier', '/branches'].includes(currentPath);
 
   const handleLogout = () => {
-    // Add your logout logic here (clear token, etc.)
-    localStorage.removeItem('authToken'); // example
+    localStorage.removeItem('authToken');
     navigate('/login');
   };
 
@@ -172,7 +171,7 @@ export default function AdminLayout({ children, title }) {
             })}
           </nav>
 
-          {/* LOGOUT BUTTON - Always at bottom */}
+          {/* LOGOUT BUTTON */}
           <div className="p-4 border-t">
             <button
               onClick={handleLogout}
@@ -184,9 +183,9 @@ export default function AdminLayout({ children, title }) {
           </div>
         </aside>
 
-        {/* MAIN CONTENT */}
-        <main className="flex-1 p-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+        {/* MAIN CONTENT — FIXED WITH SCROLL */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-6 min-h-full">
             {title && <h2 className="text-xl font-bold text-gray-900 mb-6">{title}</h2>}
             {children}
           </div>

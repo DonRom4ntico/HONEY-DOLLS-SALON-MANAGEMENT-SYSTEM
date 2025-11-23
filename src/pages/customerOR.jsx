@@ -2,7 +2,6 @@
 import { Bell, Printer } from 'lucide-react';
 
 export default function CustomerOR() {
-  // Sample receipt data
   const receipt = {
     customerName: 'Jessa Mae',
     staffName: 'Anna (Cashier)',
@@ -54,7 +53,7 @@ export default function CustomerOR() {
           <div className="space-y-6">
 
             {/* Header */}
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Honey Dolls — Customer Receipt</h2>
                 <p className="text-sm text-gray-600 mt-1">
@@ -64,7 +63,7 @@ export default function CustomerOR() {
                   Staff: <span className="font-medium">{receipt.staffName}</span>
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right w-full sm:w-auto">
                 <p className="text-sm text-gray-600">Date Issued: {receipt.dateIssued}</p>
                 <p className="text-sm font-medium text-gray-900">Order #: {receipt.orderId}</p>
               </div>
@@ -72,7 +71,7 @@ export default function CustomerOR() {
 
             {/* Table */}
             <div className="border-t border-dashed border-gray-300 pt-4">
-              <div className="grid grid-cols-4 text-sm font-medium text-gray-700 pb-2">
+              <div className="hidden sm:grid grid-cols-4 text-sm font-medium text-gray-700 pb-2">
                 <div>Item</div>
                 <div className="text-center">Qty</div>
                 <div className="text-center">Unit Price</div>
@@ -80,36 +79,49 @@ export default function CustomerOR() {
               </div>
 
               {receipt.items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-4 text-sm py-2 border-b border-dashed border-gray-200">
-                  <div className="font-medium">{item.name}</div>
-                  <div className="text-center">{item.qty}</div>
-                  <div className="text-center">₱{item.unitPrice}</div>
-                  <div className="text-right font-medium">₱{item.amount}</div>
+                <div key={idx} className="py-3 border-b border-dashed border-gray-200">
+                  {/* Mobile Layout */}
+                  <div className="sm:hidden space-y-1">
+                    <div className="font-medium text-gray-900">{item.name}</div>
+                    <div className="text-xs text-gray-600 grid grid-cols-3">
+                      <span>Qty: {item.qty}</span>
+                      <span className="text-center">₱{item.unitPrice}</span>
+                      <span className="text-right font-medium">₱{item.amount}</span>
+                    </div>
+                  </div>
+
+                  {/* Desktop Grid */}
+                  <div className="hidden sm:grid grid-cols-4 text-sm">
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-center">{item.qty}</div>
+                    <div className="text-center">₱{item.unitPrice}</div>
+                    <div className="text-right font-medium">₱{item.amount}</div>
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* Totals */}
-            <div className="border-t border-dashed border-gray-300 pt-4 space-y-1 text-sm">
-              <div className="flex justify-end gap-8">
+            <div className="border-t border-dashed border-gray-300 pt-4 space-y-2 text-sm">
+              <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span className="font-medium w-24 text-right">₱{receipt.subtotal}</span>
+                <span className="font-medium">₱{receipt.subtotal}</span>
               </div>
-              <div className="flex justify-end gap-8">
+              <div className="flex justify-between">
                 <span>VAT (12%):</span>
-                <span className="font-medium w-24 text-right">₱{receipt.vat}</span>
+                <span className="font-medium">₱{receipt.vat}</span>
               </div>
-              <div className="flex justify-end gap-8 text-base font-bold">
+              <div className="flex justify-between text-base font-bold text-gray-900">
                 <span>Total:</span>
-                <span className="w-24 text-right">₱{receipt.total}</span>
+                <span>₱{receipt.total}</span>
               </div>
-              <div className="flex justify-end gap-8">
+              <div className="flex justify-between">
                 <span>Cash:</span>
-                <span className="font-medium w-24 text-right">₱{receipt.cash}</span>
+                <span className="font-medium">₱{receipt.cash}</span>
               </div>
-              <div className="flex justify-end gap-8">
+              <div className="flex justify-between">
                 <span>Change:</span>
-                <span className="font-medium w-24 text-right">₱{receipt.change}</span>
+                <span className="font-medium text-green-600">₱{receipt.change}</span>
               </div>
             </div>
 
@@ -120,13 +132,13 @@ export default function CustomerOR() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4 mt-8">
-            <button className="px-8 py-3 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold rounded-full shadow hover:shadow-md transition flex items-center gap-2">
+          {/* FIXED BUTTONS — Now Perfect on Mobile & Desktop */}
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button className="w-full px-6 py-4 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold rounded-full shadow-lg hover:shadow-xl transition flex items-center justify-center gap-3 text-base">
               <Printer className="w-5 h-5" />
               Print Receipt
             </button>
-            <button className="px-8 py-3 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium">
+            <button className="w-full px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium text-base">
               Back to POS
             </button>
           </div>
