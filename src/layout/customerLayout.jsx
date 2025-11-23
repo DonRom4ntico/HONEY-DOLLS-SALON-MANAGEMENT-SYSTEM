@@ -7,7 +7,8 @@ import {
   Package, 
   Settings, 
   LogOut, 
-  ChevronDown 
+  ChevronDown,
+  Calendar // ← Added only this
 } from "lucide-react";
 
 export default function CustomerLayout({ children }) {
@@ -16,7 +17,6 @@ export default function CustomerLayout({ children }) {
 
   const userName = "Jana Mae";
 
-  // Check if current page matches the link
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -52,16 +52,6 @@ export default function CustomerLayout({ children }) {
               )}
             </Link>
 
-            <Link
-            
-              to="/services"
-              className={`relative transition-all ${isActive("/services") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
-            >
-              Service Menu
-              {isActive("/services") && (
-                <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-              )}
-            </Link>
 
             <Link
               to="/about"
@@ -74,11 +64,11 @@ export default function CustomerLayout({ children }) {
             </Link>
 
             <Link
-              to="/customerProd "
-              className={`relative transition-all ${isActive("/products") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
+              to="/customerProd"
+              className={`relative transition-all ${isActive("/customerProd") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
             >
               Products
-              {isActive("/products") && (
+              {isActive("/customerProd") && (
                 <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
               )}
             </Link>
@@ -105,7 +95,7 @@ export default function CustomerLayout({ children }) {
               />
             </button>
 
-            {/* DROPDOWN — STILL NICELY POSITIONED */}
+            {/* DROPDOWN */}
             {dropdownOpen && (
               <>
                 <div
@@ -123,11 +113,21 @@ export default function CustomerLayout({ children }) {
                     <Link to="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <User className="w-5 h-5" /> <span>Profile</span>
                     </Link>
-                    <Link to="/cart" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
+
+                    {/* NEW: My Appointments */}
+                    <Link 
+                      to="/myAppointment" 
+                      onClick={() => setDropdownOpen(false)} 
+                      className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
+                    >
+                      <Calendar className="w-5 h-5" /> <span>My Appointments</span>
+                    </Link>
+
+                    <Link to="/customerTransaction" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <ShoppingCart className="w-5 h-5" /> <span>My Cart</span>
                     </Link>
-                    <Link to="/orders" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
-                      <Package className="w-5 h-5" /> <span>Order</span>
+                    <Link to="/customerMyOrder" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
+                      <Package className="w-5 h-5" /> <span>Orders</span>
                     </Link>
                     <Link to="/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <Settings className="w-5 h-5" /> <span>Settings</span>

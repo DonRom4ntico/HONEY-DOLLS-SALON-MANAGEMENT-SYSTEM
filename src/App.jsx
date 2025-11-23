@@ -29,6 +29,10 @@ import CustomerReturnedProducts from "./pages/customerReturnedProducts";
 import AdminProductDamage from "./pages/adminProductDamage";
 import AdminAnnouncement from "./pages/adminAnnouncement";
 import AdminDisplayProduct from "./pages/adminDisplayProduct";
+import MyAppointment from "./pages/myAppointment";
+import About from "./pages/about";
+import Profile from "./pages/profile";
+import Settings from "./pages/settings";
 
 
 function App() {
@@ -60,6 +64,10 @@ function App() {
         <Route path="/adminProductDamage" element={<AdminProductDamage />} />
         <Route path="/adminAnnouncement" element={<AdminAnnouncement />} />
         <Route path="/adminDisplayProduct" element={<AdminDisplayProduct />} />
+        <Route path="/myAppointment" element={<MyAppointment />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
 
       </Routes>
     </BrowserRouter>
