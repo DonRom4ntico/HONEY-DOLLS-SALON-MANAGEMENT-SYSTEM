@@ -1,7 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Bell } from "lucide-react";
 
+const API_BASE = import.meta.env.VITE_API_BASE; // should be http://localhost:3000/api
+
 const Login = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post(`${API_BASE}/user/login`, {
+        email,
+        password,
+      });
+
+      // store JWT and user info in localStorage
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // navigate to dashboard or home page
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || "Login failed");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
       {/* ====================== HEADER ====================== */}
@@ -22,7 +50,6 @@ const Login = () => {
               </p>
             </div>
           </div>
-
           <Bell className="w-7 h-7 text-yellow-600" />
         </div>
       </header>
@@ -34,7 +61,15 @@ const Login = () => {
             Login to Your Account
           </h2>
 
-          <form className="space-y-5">
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+          <form
+            className="space-y-5"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -42,7 +77,10 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:border-orange-400"
+                required
               />
             </div>
 
@@ -53,7 +91,10 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:border-orange-400"
+                required
               />
             </div>
 
@@ -65,13 +106,16 @@ const Login = () => {
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-pink-500 hover:text-pink-600 font-medium">
+              <a
+                href="#"
+                className="text-pink-500 hover:text-pink-600 font-medium"
+              >
                 Forgot password?
               </a>
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md transition-all duration-200"
             >
               Login
@@ -86,7 +130,10 @@ const Login = () => {
 
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <a href="#" className="text-pink-500 hover:text-pink-600 font-medium">
+            <a
+              href="/register"
+              className="text-pink-500 hover:text-pink-600 font-medium"
+            >
               Register here
             </a>
           </p>
@@ -96,7 +143,8 @@ const Login = () => {
       <footer className="bg-white/80 py-3 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-xs text-gray-600 text-center">
-            Honey Dolls • Brilliant Beauty Hub — Davao | Visit us at Gaisano Mall | Open Daily 9:00AM – 9:00PM
+            Honey Dolls • Brilliant Beauty Hub — Davao | Visit us at Gaisano
+            Mall | Open Daily 9:00AM – 9:00PM
           </p>
         </div>
       </footer>
