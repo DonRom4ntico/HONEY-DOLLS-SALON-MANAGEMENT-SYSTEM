@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 export default function AdminProductsSold() {
   return (
-    <AdminLayout title="Product Sold Records">
+    <AdminLayout title="">
       <ProductsSoldContent />
     </AdminLayout>
   );
@@ -48,24 +48,11 @@ function ProductsSoldContent() {
       `}</style>
 
       {/* HEADER */}
-      <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm no-print sticky top-0 z-50">
+      <header className=" shadow- no-print sticky top-0 z-50">
         <div className="px-6 py-4 flex items-center justify-between">
           <h1 className="text-lg md:text-xl font-bold text-gray-800">Products Sold</h1>
 
-          {/* BRANCH DROPDOWN */}
-          <div className="relative">
-            <button className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border text-sm">
-              {selectedBranch} Branch <ChevronDown size={16} />
-            </button>
-          </div>
 
-          {/* PRINT BUTTON */}
-          <button
-            onClick={handlePrint}
-            className="no-print bg-white flex items-center gap-2 px-4 py-2 rounded-full shadow-md border text-gray-700 hover:bg-gray-100 transition"
-          >
-            <Printer size={18} /> Print
-          </button>
 
           {/* MOBILE HAMBURGER */}
           <button
@@ -76,7 +63,8 @@ function ProductsSoldContent() {
           </button>
         </div>
       </header>
-
+    {/* BLACK LINE SEPARATOR */}
+        <div className="w-full h-[1px] bg-gray-300 mb-6"></div>
       {/* SIDEBAR OVERLAY */}
       {isSidebarOpen && (
         <div
@@ -111,16 +99,39 @@ function ProductsSoldContent() {
       {/* CONTENT WRAPPER */}
       <div className="p-6">
 
-        {/* SEARCH BAR */}
-        <div className="flex items-center gap-3 mb-6 bg-white p-3 rounded-xl shadow">
-          <Search size={20} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="flex-1 outline-none text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* SEARCH + BRANCH + PRINT IN ONE LINE */}
+        <div className="no-print flex items-center justify-between bg-white p-3 rounded-xl shadow mb-6">
+
+          {/* LEFT SIDE: SEARCH + DROPDOWN */}
+          <div className="flex items-center gap-3">
+
+            {/* SMALL SEARCH BAR */}
+            <div className="flex items-center gap-2 bg-gray-50 border px-3 py-2 rounded-full w-[220px]">
+              <Search size={18} className="text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="flex-1 outline-none text-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* DROPDOWN */}
+            <button className="flex items-center gap-2 bg-gray-50 border px-4 py-2 rounded-full text-sm shadow-sm">
+              {selectedBranch} Branch <ChevronDown size={16} />
+            </button>
+
+          </div>
+
+          {/* RIGHT SIDE: PRINT BUTTON */}
+          <button
+            onClick={handlePrint}
+            className="no-print bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-full border shadow text-gray-700 hover:bg-gray-100 transition text-sm"
+          >
+            <Printer size={18} /> Print
+          </button>
+
         </div>
 
         {/* TABLE */}
