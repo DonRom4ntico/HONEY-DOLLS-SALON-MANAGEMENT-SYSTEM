@@ -1,83 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 
-const products = [
-  {
-    id: 1,
-    name: "Honey Glow Serum",
-    price: 450,
-    category: "Skin Care",
-    rating: 4.8,
-    reviews: 120,
-    image: "/images/honeyglow.png",
-  },
-  {
-    id: 2,
-    name: "Silky Smooth Shampoo",
-    price: 350,
-    category: "Hair Care",
-    rating: 4.6,
-    reviews: 98,
-    image: "/images/shampoo.png",
-  },
-  {
-    id: 3,
-    name: "Luxe Nail Polish Set",
-    price: 299,
-    category: "Nails",
-    rating: 4.9,
-    reviews: 210,
-    image: "/images/nailset.png",
-  },
-  {
-    id: 4,
-    name: "Body Glow Lotion",
-    price: 290,
-    category: "Body",
-    rating: 4.7,
-    reviews: 84,
-    image: "/images/lotion.png",
-  },
-  {
-    id: 5,
-    name: "Hydra Mist Toner",
-    price: 420,
-    category: "Skin Care",
-    rating: 4.5,
-    reviews: 75,
-    image: "/images/toner.png",
-  },
-  {
-    id: 6,
-    name: "Honey Spa Scrub",
-    price: 560,
-    category: "Body",
-    rating: 4.8,
-    reviews: 133,
-    image: "/images/scrub.png",
-  },
-  {
-    id: 7,
-    name: "Luxe Nail Polish Set",
-    price: 299,
-    category: "Nails",
-    rating: 4.9,
-    reviews: 210,
-    image: "/images/nailset.png",
-  },
-  {
-    id: 8,
-    name: "Luxe Nail Polish Set",
-    price: 299,
-    category: "Nails",
-    rating: 4.9,
-    reviews: 210,
-    image: "/images/nailset.png",
-  },
-];
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const CustomerProd = () => {
+  const [products, setProducts] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [sortBy, setSortBy] = useState("Relevance");
+  const [priceFilter, setPriceFilter] = useState("All Prices");
+
+  // Fetch products from backend
+  useEffect(() => {
+    fetch(`${API_BASE}/products`)
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products))
+      .catch((err) => console.error("Error fetching products:", err));
+  }, []);
 
   const handleCategoryChange = (category) => {
     if (selectedCategories.includes(category)) {
@@ -87,10 +25,36 @@ const CustomerProd = () => {
     }
   };
 
-  const filteredProducts =
-    selectedCategories.length > 0
-      ? products.filter((p) => selectedCategories.includes(p.category))
-      : products;
+  // Filter products by category
+  let filteredProducts = selectedCategories.length
+    ? products.filter((p) => selectedCategories.includes(p.category))
+    : products;
+
+  // Filter by price
+  filteredProducts = filteredProducts.filter((p) => {
+    switch (priceFilter) {
+      case "₱100 - ₱300":
+        return p.price >= 100 && p.price <= 300;
+      case "₱301 - ₱500":
+        return p.price >= 301 && p.price <= 500;
+      case "₱501+":
+        return p.price >= 501;
+      default:
+        return true;
+    }
+  });
+
+  // Sort products
+  filteredProducts.sort((a, b) => {
+    switch (sortBy) {
+      case "Price: Low to High":
+        return a.price - b.price;
+      case "Price: High to Low":
+        return b.price - a.price;
+      default:
+        return 0; // Relevance or default order from backend
+    }
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
@@ -115,7 +79,8 @@ const CustomerProd = () => {
           <div className="flex items-center gap-2">
             <Bell className="w-6 h-6 text-yellow-600" />
             <span className="text-orange-900 font-medium text-sm hidden sm:inline">
-              Welcome, Keoski <span className="text-yellow-600">Philippines</span>
+              Welcome, Keoski{" "}
+              <span className="text-yellow-600">Philippines</span>
             </span>
           </div>
         </div>
@@ -127,19 +92,30 @@ const CustomerProd = () => {
         <aside className="w-56 bg-white rounded-xl p-4 shadow-sm h-fit">
           <h2 className="font-semibold text-lg text-gray-800 mb-2">Filters</h2>
           <hr className="border-gray-200 mb-3" />
+
           <label className="block text-sm mb-1">Sort By</label>
-          <select className="w-full border rounded p-2 mb-3 text-sm">
-            <option>Relevance ▼</option>
+          <select
+            className="w-full border rounded p-2 mb-3 text-sm"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option>Relevance</option>
             <option>Price: Low to High</option>
             <option>Price: High to Low</option>
           </select>
+
           <label className="block text-sm mb-1">Price</label>
-          <select className="w-full border rounded p-2 mb-3 text-sm">
-            <option>All Prices ▼</option>
+          <select
+            className="w-full border rounded p-2 mb-3 text-sm"
+            value={priceFilter}
+            onChange={(e) => setPriceFilter(e.target.value)}
+          >
+            <option>All Prices</option>
             <option>₱100 - ₱300</option>
             <option>₱301 - ₱500</option>
             <option>₱501+</option>
           </select>
+
           <p className="text-sm font-semibold text-gray-800 mb-2">
             Filter by Category
           </p>
@@ -156,7 +132,11 @@ const CustomerProd = () => {
             ))}
           </div>
           <button
-            onClick={() => setSelectedCategories([])}
+            onClick={() => {
+              setSelectedCategories([]);
+              setSortBy("Relevance");
+              setPriceFilter("All Prices");
+            }}
             className="w-full bg-[#fca9a9] hover:bg-[#fb8d8d] text-white py-2 rounded font-semibold"
           >
             Clear Filters
@@ -171,12 +151,12 @@ const CustomerProd = () => {
           <div className="grid grid-cols-4 gap-5">
             {filteredProducts.map((product) => (
               <div
-                key={product.id}
+                key={product.productid} // backend uses productid
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 text-center"
               >
                 <img
-                  src={product.image}
-                  alt={product.name}
+                  src={product.prodimage || "/images/default.png"}
+                  alt={product.prodname}
                   className="w-28 h-28 object-contain mx-auto mb-2"
                 />
                 <h3 className="font-medium text-gray-800 text-sm">
@@ -186,7 +166,7 @@ const CustomerProd = () => {
                   ₱{product.price}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Category: {product.category}
+                  Category: {product.prodcat}
                 </p>
                 <p className="text-xs text-yellow-500">
                   ⭐ {product.rating} ({product.reviews})
@@ -204,8 +184,8 @@ const CustomerProd = () => {
       <footer className="bg-white/80 py-3 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-xs text-gray-600 text-center">
-            Honey Dolls • Brilliant Beauty Hub — Davao | Open Daily 9:00AM–9:00PM
-            | Call (0994) 912 6618
+            Honey Dolls • Brilliant Beauty Hub — Davao | Open Daily
+            9:00AM–9:00PM | Call (0994) 912 6618
           </p>
         </div>
       </footer>
