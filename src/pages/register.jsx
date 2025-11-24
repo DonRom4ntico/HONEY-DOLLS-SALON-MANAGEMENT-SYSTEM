@@ -138,6 +138,7 @@ const Register = () => {
 
             <button
               type="submit"
+              g
               disabled={loading}
               className="w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md transition-all duration-200"
             >
