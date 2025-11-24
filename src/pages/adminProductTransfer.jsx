@@ -68,12 +68,14 @@ export default function AdminProductTransfer() {
   };
 
   return (
-    <AdminLayout title="Transfer Products" currentPath="/admin/transfer">
+    <AdminLayout title="" currentPath="/admin/transfer">
       {/* Only added pb-32 to the main container so buttons are never cut off */}
       <div className="min-h-screen bg-white pb-32">
         <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
 
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Transfer Products</h2>
+          {/* BLACK LINE SEPARATOR */}
+        <div className="w-full h-[1px] bg-gray-300 mb-6"></div>
 
           {/* BRANCH SELECTION */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -95,31 +97,38 @@ export default function AdminProductTransfer() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reference Code</label>
-              <div className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-600 font-medium">
+              <div className="w-50 px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-600 font-medium">
                 TR-20251027-001
               </div>
             </div>
           </div>
 
-          {/* SEARCH + ADD PRODUCT — now visible */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search product..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
-              />
-            </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-orange-400 to-pink-400 text-white font-medium rounded-xl hover:shadow-md transition flex items-center gap-2 whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" /> Add Product
-            </button>
-          </div>
+ <div className="flex items-center justify-between mb-8 gap-8">
+  <div className="relative w-full max-w-md">
+    <Search className="mt-2.5 absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+    <input
+      type="text"
+      placeholder="Search product..."
+      value={searchTerm}
+      onChange={e => setSearchTerm(e.target.value)}
+      className="w-full pl-12 pr-6 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm"
+    />
+  </div>
+
+  <button
+    onClick={() => setShowAddModal(true)}
+    style={{
+      background: 'linear-gradient(to right, #ec4899, #f97316)',
+      padding: '10px 24px',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+    }}
+    className="inline-flex items-center gap-2.5 text-white font-bold text-sm whitespace-nowrap hover:scale-103 transition-all duration-200 hover:shadow-xl flex-shrink-0"
+  >
+    <Plus className="w-5 h-5" />
+    Add Product
+  </button>
+</div>
 
           {/* TABLE */}
           <div className="overflow-x-auto mb-6">
@@ -183,7 +192,14 @@ export default function AdminProductTransfer() {
             <button className="px-8 py-3 border border-gray-300 rounded-full font-medium text-gray-700 hover:bg-gray-50 transition">
               Cancel
             </button>
-            <button className="px-10 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full font-bold hover:shadow-lg transition shadow-md">
+            <button style={{
+      background: 'linear-gradient(to right, #ec4899, #f97316)',
+      padding: '10px 24px',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+    }} 
+            className="px-10 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full font-bold hover:scale-103 hover:shadow-lg transition shadow-md">
+              
               Submit Transfer
             </button>
           </div>
@@ -262,8 +278,14 @@ export default function AdminProductTransfer() {
               </button>
               <button
                 onClick={handleAddProduct}
-                disabled={!selectedProduct}
-                className="px-6 py-2 bg-gradient-to-r from-orange-400 to-pink-400 text-white rounded-lg font-medium hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!selectedProduct}   
+                className="px-6 py-2 bg-gradient-to-r from-orange-400 to-pink-400 text-white rounded-lg font-medium hover:scale-103 hover:shadow-lg transition shadow-md cursor-pointer"
+              style={{
+      background: 'linear-gradient(to right, #ec4899, #f97316)',
+      padding: '10px 24px',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+    }}  
               >
                 Add to Transfer
               </button>

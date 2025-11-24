@@ -34,12 +34,9 @@ export default function AdminLayout({ children, title }) {
     },
     { header: 'Action' },
     { icon: FileText, label: 'Record Product Usage', path: '/staff-prod-usage' },
-    { icon: ArrowRightLeft, label: 'Transfer Products', path: '/transfer-products' },
-    { icon: Trash2, label: 'Record Product Waste', path: '/recordProductWaste' },
-    { icon: AlertTriangle, label: 'Record Product Damaged', path: '/record-damaged' },
     { icon: DollarSign, label: 'Supplier Purchases', path: '/supplier-purchases' },
     { icon: PlusCircle, label: 'Add Product Display', path: '/adminDisplayProduct' },
-    { icon: Archive, label: 'Transaction', path: '/transaction' },
+    { icon: Archive, label: 'Transaction', path: '/Transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
 

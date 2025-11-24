@@ -33,6 +33,7 @@ import MyAppointment from "./pages/myAppointment";
 import About from "./pages/about";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
+import Transaction from "./pages/Transaction";
 
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/Transaction" element={<Transaction />} />
 
       </Routes>
     </BrowserRouter>
