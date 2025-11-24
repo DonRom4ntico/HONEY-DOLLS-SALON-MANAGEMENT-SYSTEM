@@ -1,30 +1,22 @@
 // src/pages/Settings.jsx
 import React from "react";
 import CustomerLayout from "../layout/customerLayout";
-import {
-  Mail,
-  Lock,
-  Smartphone,
-  Shield,
-  Globe,
-  LogOut,
-  ChevronRight,
-} from "lucide-react";
+import { Mail, Lock, Smartphone, Shield, Globe, LogOut, ChevronRight } from "lucide-react";
 
 export default function Settings() {
   return (
     <CustomerLayout>
       <main className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 pt-20 pb-16">
         <div className="max-w-4xl mx-auto px-6 py-8">
+
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-orange-900">Settings</h1>
-            <p className="text-gray-600 mt-2">
-              Manage your account and preferences
-            </p>
+            <p className="text-gray-600 mt-2">Manage your account and preferences</p>
           </div>
 
           <div className="space-y-6">
+
             {/* Account & Security */}
             <div className="bg-white rounded-2xl shadow-lg border border-pink-100 overflow-hidden">
               <div className="bg-gradient-to-r from-[#FFD36E] to-[#F59E9E] px-8 py-5">
@@ -41,12 +33,8 @@ export default function Settings() {
                       <Mail className="w-6 h-6 text-purple-600" />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-gray-800">
-                        Email Address
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        alita.angel@gmail.com
-                      </p>
+                      <p className="font-semibold text-gray-800">Email Address</p>
+                      <p className="text-sm text-gray-500">alita.angel@gmail.com</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-orange-600 transition" />
@@ -58,12 +46,8 @@ export default function Settings() {
                       <Lock className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-gray-800">
-                        Change Password
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Secure your account
-                      </p>
+                      <p className="font-semibold text-gray-800">Change Password</p>
+                      <p className="text-sm text-gray-500">Secure your account</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-orange-600 transition" />
@@ -75,9 +59,7 @@ export default function Settings() {
                       <Smartphone className="w-6 h-6 text-green-600" />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-gray-800">
-                        Phone Number
-                      </p>
+                      <p className="font-semibold text-gray-800">Phone Number</p>
                       <p className="text-sm text-gray-500">+63 917 123 4567</p>
                     </div>
                   </div>
@@ -113,6 +95,7 @@ export default function Settings() {
                 Log Out
               </button>
             </div>
+
           </div>
         </div>
       </main>

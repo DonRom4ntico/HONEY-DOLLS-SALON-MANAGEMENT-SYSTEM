@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CustomerLayout from "../layout/customerLayout";
-import { X, Minus, Plus } from "lucide-react";
+import { Bell, X, Star, Minus, Plus, Filter } from "lucide-react";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -10,8 +10,9 @@ const CustomerProd = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // 👉 Fetch products
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -25,7 +26,7 @@ const CustomerProd = () => {
     fetchProducts();
   }, []);
 
-  // 👉 Category filter logic
+  // Category filter
   const handleCategoryChange = (category) => {
     if (selectedCategories.includes(category)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== category));
@@ -38,6 +39,55 @@ const CustomerProd = () => {
     selectedCategories.length > 0
       ? products.filter((p) => selectedCategories.includes(p.prodcat))
       : products;
+
+  const FilterSidebar = () => (
+    <aside className="w-56 bg-white rounded-xl p-6 shadow-sm h-fit">
+      <h2 className="font-semibold text-lg text-gray-800 mb-4">Filters</h2>
+      <hr className="border-gray-200 mb-4" />
+
+      <label className="block text-sm font-medium mb-2">Sort By</label>
+      <select className="w-full border rounded-lg p-3 mb-5 text-sm">
+        <option>Relevance</option>
+        <option>Price: Low to High</option>
+        <option>Price: High to Low</option>
+      </select>
+
+      <label className="block text-sm font-medium mb-2">Price</label>
+      <select className="w-full border rounded-lg p-3 mb-6 text-sm">
+        <option>All Prices</option>
+        <option>₱100 - ₱300</option>
+        <option>₱301 - ₱500</option>
+        <option>₱501+</option>
+      </select>
+
+      <p className="text-sm font-semibold text-gray-800 mb-3">
+        Filter by Category
+      </p>
+      <div className="flex flex-col gap-3 mb-6">
+        {["Hair Care", "Skin Care", "Body", "Nails"].map((category) => (
+          <label
+            key={category}
+            className="flex items-center gap-3 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(category)}
+              onChange={() => handleCategoryChange(category)}
+              className="w-4 h-4 accent-pink-500"
+            />
+            <span className="text-sm">{category}</span>
+          </label>
+        ))}
+      </div>
+
+      <button
+        onClick={() => setSelectedCategories([])}
+        className="w-full bg-[#fca9a9] hover:bg-[#fb8d8d] text-white py-3 rounded-lg font-semibold transition"
+      >
+        Clear Filters
+      </button>
+    </aside>
+  );
 
   return (
     <CustomerLayout>
@@ -64,11 +114,12 @@ const CustomerProd = () => {
                 ₱{product.price}
               </p>
 
-              {/* VIEW PRODUCT BUTTON */}
+              {/* ⭐ VIEW PRODUCT BUTTON (ADDED) */}
               <button
                 onClick={() => {
                   setSelectedProduct(product);
                   setQuantity(1);
+                  setIsFilterOpen(false);
                 }}
                 className="mt-3 w-full bg-[#fca9a9] hover:bg-[#fb8d8d] text-white py-2 rounded-lg text-sm font-semibold transition"
               >
@@ -79,11 +130,10 @@ const CustomerProd = () => {
         </div>
       </div>
 
-      {/* ⭐ PRODUCT MODAL ⭐ */}
+      {/* ================= PRODUCT MODAL (unchanged, your original modal) ================= */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md relative shadow-lg">
-            {/* Close button */}
+          <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
             <button
               onClick={() => setSelectedProduct(null)}
               className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
@@ -91,61 +141,44 @@ const CustomerProd = () => {
               <X />
             </button>
 
-            {/* Product Image */}
             <img
               src={`${API_BASE}/upload/${selectedProduct.prodimage}`}
               alt={selectedProduct.prodname}
-              className="w-full h-52 object-contain mb-4 rounded-lg"
+              className="w-full h-52 object-contain mb-4"
             />
 
-            {/* Name */}
-            <h2 className="text-lg font-bold text-gray-900">
-              {selectedProduct.prodname}
-            </h2>
+            <h2 className="text-lg font-bold">{selectedProduct.prodname}</h2>
 
-            {/* Price */}
-            <p className="mt-2 text-[#f97316] font-bold text-2xl">
+            <p className="mt-2 text-[#f97316] font-bold text-xl">
               ₱{selectedProduct.price}
             </p>
 
-            {/* Description */}
             <p className="text-sm text-gray-600 mt-2">
               {selectedProduct.description || "No description available."}
             </p>
 
-            {/* Quantity selector */}
-            <div className="flex items-center gap-4 mt-5 justify-center">
+            {/* quantity selector */}
+            <div className="flex items-center gap-4 mt-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                className="p-2 bg-gray-200 rounded-lg"
               >
                 <Minus />
               </button>
 
-              <span className="text-lg font-semibold w-6 text-center">
-                {quantity}
-              </span>
+              <span className="text-lg font-semibold">{quantity}</span>
 
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                className="p-2 bg-gray-200 rounded-lg"
               >
                 <Plus />
               </button>
             </div>
 
-            {/* ACTION BUTTONS */}
-            <div className="mt-6 flex gap-3">
-              {/* Add to Cart */}
-              <button className="w-1/2 bg-[#fca9a9] hover:bg-[#fb8d8d] text-white py-3 rounded-lg font-semibold transition">
-                Add to Cart
-              </button>
-
-              {/* Buy Now */}
-              <button className="w-1/2 bg-[#f97316] hover:bg-[#fb7c1d] text-white py-3 rounded-lg font-semibold transition">
-                Buy Now
-              </button>
-            </div>
+            <button className="mt-5 w-full bg-[#fb8d8d] hover:bg-[#f97373] text-white py-3 rounded-lg font-semibold">
+              Add to Cart
+            </button>
           </div>
         </div>
       )}
