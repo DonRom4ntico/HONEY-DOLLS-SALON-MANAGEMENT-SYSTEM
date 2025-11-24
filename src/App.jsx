@@ -24,6 +24,7 @@ import AdminStaffSchedule from "./pages/adminStaffSchedule";
 import AdminProductTransfer from "./pages/adminProductTransfer";
 import AdminProductSold from "./pages/adminProductSold";
 import AdminProductWaste from "./pages/adminProductWaste";
+import AdminProductUsage from "./pages/adminProductUsage";
 import RecordProductWaste from "./pages/recordProductWaste";
 import CustomerReturnedProducts from "./pages/customerReturnedProducts";
 import AdminProductDamage from "./pages/adminProductDamage";
@@ -34,6 +35,7 @@ import About from "./pages/about";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Transaction from "./pages/Transaction";
+import SupplierPurchases from "./pages/supplierPurchases";
 
 
 function App() {
@@ -60,6 +62,7 @@ function App() {
         <Route path="/adminProductTransfer" element={<AdminProductTransfer />} />
         <Route path="/adminProductSold" element={<AdminProductSold />} />
         <Route path="/adminProductWaste" element={<AdminProductWaste />} />
+        <Route path="/adminProductUsage" element={<AdminProductUsage />} />
         <Route path="/recordProductWaste" element={<RecordProductWaste />} />
         <Route path="/customerReturnedProducts" element={<CustomerReturnedProducts />} />
         <Route path="/adminProductDamage" element={<AdminProductDamage />} />
@@ -70,6 +73,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/Transaction" element={<Transaction />} />
+        <Route path="/supplierPurchases" element={<SupplierPurchases />} />
+        
 
       </Routes>
     </BrowserRouter>
