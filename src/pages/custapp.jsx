@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import logo from "../assets/logos.png";
+import DatePicker from "react-datepicker";
+import { Calendar } from "lucide-react";
+import "react-datepicker/dist/react-datepicker.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -54,8 +57,8 @@ const Custapp = () => {
     });
   };
 
-  const formatDate = (dateStr) =>
-    new Date(dateStr).toLocaleDateString("en-US", {
+  const formatDate = (dateObj) =>
+    dateObj.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

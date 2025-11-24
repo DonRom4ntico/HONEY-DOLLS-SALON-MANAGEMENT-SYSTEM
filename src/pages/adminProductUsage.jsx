@@ -87,8 +87,14 @@ export default function AdminProductUsage() {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Record Product Usage</h2>
             <button
+style={{
+      background: 'linear-gradient(to right, #ec4899, #f97316)',
+      padding: '10px 24px',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+    }}            
               onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-orange-400 to-pink-400 text-white font-medium rounded-xl hover:shadow-md transition flex items-center gap-2"
+              className="px-6 py-3 bg-gradient-to-r from-orange-400 to-pink-400 text-white font-medium rounded-xl hover:shadow-md transition flex items-center gap-2 hover:scale-103"
             >
               <Plus className="w-5 h-5" />
               Record Usage

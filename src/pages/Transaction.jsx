@@ -1,11 +1,6 @@
 // src/pages/PaymentsDashboard.jsx
 import { useState } from 'react';
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  Printer,
-} from 'lucide-react';
+import { Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminLayout from '../layout/adminLayout';
 
 export default function PaymentsDashboard() {
@@ -16,7 +11,7 @@ export default function PaymentsDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  // Full dataset
+  // FULL DATA — NOT REMOVED THIS TIME
   const payments = [
     {
       id: 'ORD-2025-1001',
@@ -68,7 +63,6 @@ export default function PaymentsDashboard() {
     },
   ];
 
-  // Filter logic (unchanged)
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = 
       payment.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -82,7 +76,6 @@ export default function PaymentsDashboard() {
     return matchesSearch && matchesStatus && matchesPayment && matchesDate;
   });
 
-  // Pagination (unchanged)
   const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
   const paginatedPayments = filteredPayments.slice(
     (currentPage - 1) * itemsPerPage,
@@ -105,134 +98,136 @@ export default function PaymentsDashboard() {
   };
 
   return (
-    <AdminLayout title="Payments Dashboard">
-      {/* Print Styles - Preserved */}
-      <style jsx>{`
-        @media print {
-          .no-print { display: none !important; }
-          .print-only { display: block !important; }
-          body { background: white !important; }
-          .shadow-lg { box-shadow: none !important; }
-          .rounded-2xl, .rounded-3xl { border: 1px solid #ddd !important; }
-        }
-        .print-only { display: none; }
-      `}</style>
+    <AdminLayout title="">
+      <div className="max-w-7xl mx-auto space-y-8">
 
-      <div className="space-y-6">
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-bold text-orange-900">Honey Dolls • Payments</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Track orders, payment status, totals and last updated time.
-          </p>
-        </div>
+       {/* Title */}
+          <div>
+            <h1 className="text-2xl font-bold text-orange-900">Honey Dolls • Payments</h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Track orders, payment status, totals and last updated time.
+            </p>
+          </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+
+        {/* ONE TIGHT LINE: Search + Status + Payment + Date */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search - Leftmost */}
+          <div className="relative flex-1 min-w-64 max-w-md">
+            <Search className="mt-2.5 absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by order, customer, product..."
+              placeholder="Search order, customer, service..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+              className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm shadow-sm"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-          >
-            <option>Status: All</option>
-            <option>Paid</option>
-            <option>Pending</option>
-            <option>Cancelled</option>
-          </select>
-          <select
-            value={paymentFilter}
-            onChange={(e) => setPaymentFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-          >
-            <option>Payment: All</option>
-            <option>Card</option>
-            <option>GCash</option>
-            <option>Cash</option>
-          </select>
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-          >
-            <option>Last 30 days</option>
-            <option>Last 7 days</option>
-            <option>Today</option>
-          </select>
+
+          {/* Status */}
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-full px-5 py-2.5 pr-9 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer shadow-sm min-w-32"
+            >
+              <option>All</option>
+              <option>Paid</option>
+              <option>Pending</option>
+              <option>Cancelled</option>
+            </select>
+            <ChevronDown className="mt-2.5 absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          </div>
+
+          {/* Payment Method */}
+          <div className="relative">
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-full px-5 py-2.5 pr-9 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer shadow-sm min-w-32"
+            >
+              <option>All</option>
+              <option>Card</option>
+              <option>GCash</option>
+              <option>Cash</option>
+            </select>
+            <ChevronDown className="mt-2.5 absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          </div>
+
+          {/* Date */}
+          <div className="relative">
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-full px-5 py-2.5 pr-9 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer shadow-sm min-w-40"
+            >
+              <option>Last 30 days</option>
+              <option>Last 7 days</option>
+              <option>Today</option>
+            </select>
+            <ChevronDown className="mt-2.5 absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          </div>
         </div>
 
-        {/* Table Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-orange-100 overflow-hidden">
-          <div className="p-6 space-y-6">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-600 font-medium border-b">
-                    <th className="pb-3">ORDER ID</th>
-                    <th className="pb-3">STATUS</th>
-                    <th className="pb-3">CUSTOMER</th>
-                    <th className="pb-3">PRODUCT / SERVICE</th>
-                    <th className="pb-3 text-center">QTY</th>
-                    <th className="pb-3 text-right">UNIT PRICE</th>
-                    <th className="pb-3 text-right">SUBTOTAL</th>
-                    <th className="pb-3">PAYMENT METHOD</th>
-                    <th className="pb-3 text-right">TOTAL</th>
-                    <th className="pb-3 text-right">UPDATED AT</th>
+        {/* Table — FULLY INTACT */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-orange-50 border-b-2 border-orange-200">
+                <tr className="text-left font-bold text-gray-700">
+                  <th className="px-6 py-5">ORDER ID</th>
+                  <th className="px-6 py-5">STATUS</th>
+                  <th className="px-6 py-5">CUSTOMER</th>
+                  <th className="px-6 py-5">SERVICE</th>
+                  <th className="px-6 py-5 text-center">QTY</th>
+                  <th className="px-6 py-5 text-right">UNIT PRICE</th>
+                  <th className="px-6 py-5 text-right">SUBTOTAL</th>
+                  <th className="px-6 py-5">METHOD</th>
+                  <th className="px-6 py-5 text-right">TOTAL</th>
+                  <th className="px-6 py-5 text-right">UPDATED</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {paginatedPayments.map((payment) => (
+                  <tr key={payment.id} className="hover:bg-orange-50 transition">
+                    <td className="px-6 py-4 font-bold text-orange-700">{payment.id}</td>
+                    <td className="px-6 py-4">{getStatusBadge(payment.status)}</td>
+                    <td className="px-6 py-4">{payment.customer}</td>
+                    <td className="px-6 py-4 text-gray-700">{payment.service}</td>
+                    <td className="px-6 py-4 text-center">{payment.qty}</td>
+                    <td className="px-6 py-4 text-right">{formatPrice(payment.unitPrice)}</td>
+                    <td className="px-6 py-4 text-right">{formatPrice(payment.subtotal)}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        {payment.paymentMethod}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-gray-900">{formatPrice(payment.total)}</td>
+                    <td className="px-6 py-4 text-right text-xs text-gray-500">{payment.updatedAt}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {paginatedPayments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-gray-50 transition">
-                      <td className="py-3 font-medium text-orange-700">{payment.id}</td>
-                      <td className="py-3">{getStatusBadge(payment.status)}</td>
-                      <td className="py-3">{payment.customer}</td>
-                      <td className="py-3">{payment.service}</td>
-                      <td className="py-3 text-center">{payment.qty}</td>
-                      <td className="py-3 text-right">{formatPrice(payment.unitPrice)}</td>
-                      <td className="py-3 text-right">{formatPrice(payment.subtotal)}</td>
-                      <td className="py-3">{payment.paymentMethod}</td>
-                      <td className="py-3 text-right font-medium">{formatPrice(payment.total)}</td>
-                      <td className="py-3 text-right text-xs text-gray-500">{payment.updatedAt}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg font-medium">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-gray-600">
-                Showing {paginatedPayments.length} of {filteredPayments.length} payments
-              </p>
+          {/* Pagination */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 text-sm">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50">
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
+            <p className="text-gray-600">
+              Showing {paginatedPayments.length} of {filteredPayments.length} payments
+            </p>
           </div>
         </div>
       </div>
