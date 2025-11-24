@@ -20,6 +20,7 @@ export default function AdminLayout({ children, title }) {
     { header: 'Products' },
     { icon: ArrowRightLeft, label: 'Products Transfer', path: '/adminProductTransfer' },
     { icon: Box, label: 'Products Sold', path: '/adminProductSold' },
+    { icon: FileText, label: 'Product Usage', path: '/adminProductUsage' },
     { icon: Trash2, label: 'Products Wasted', path: '/adminProductWaste' },
     { icon: AlertTriangle, label: 'Products Damaged', path: '/adminProductDamage' },
     {
@@ -28,20 +29,19 @@ export default function AdminLayout({ children, title }) {
       dropdown: true,
       items: [
         { icon: Users, label: 'Customer', path: '/customerReturnedProducts' },
-        { icon: Store, label: 'Supplier', path: '/supplier' },
-        { icon: Building, label: 'Branches', path: '/branches' },
+        { icon: Store, label: 'Supplier', path: '/supplierReturn' },
+        { icon: Building, label: 'Branches', path: '/branchReturn' },
       ],
     },
     { header: 'Action' },
-    { icon: FileText, label: 'Record Product Usage', path: '/staff-prod-usage' },
-    { icon: DollarSign, label: 'Supplier Purchases', path: '/supplier-purchases' },
+    { icon: DollarSign, label: 'Supplier Purchases', path: '/supplierPurchases' },
     { icon: PlusCircle, label: 'Add Product Display', path: '/adminDisplayProduct' },
     { icon: Archive, label: 'Transaction', path: '/Transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
 
   const currentPath = location.pathname;
-  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplier', '/branches'].includes(currentPath);
+  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplierReturn', '/branches'].includes(currentPath);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');

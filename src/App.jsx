@@ -34,6 +34,11 @@ import About from "./pages/about";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Transaction from "./pages/Transaction";
+import AdminProductUsage from "./pages/adminProductUsage";
+import Inventory from "./pages/inventory";
+import SupplierPurchases from "./pages/supplierPurchases";
+import SupplierReturn from "./pages/supplierReturn";
+import BranchReturn from "./pages/branchReturn";
 
 
 function App() {
@@ -70,6 +75,12 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/Transaction" element={<Transaction />} />
+        <Route path="/adminProductUsage" element={<AdminProductUsage />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/supplierPurchases" element={<SupplierPurchases />} />
+        <Route path="/supplierReturn" element={<SupplierReturn />} />
+        <Route path="/branchReturn" element={<BranchReturn />} />
+        
 
       </Routes>
     </BrowserRouter>

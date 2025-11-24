@@ -1,184 +1,173 @@
 // src/pages/customerReturnedProducts.jsx
-import { Upload, X } from 'lucide-react';
 import { useState } from 'react';
+import { Search, ChevronDown, Eye, Package } from 'lucide-react';
 import AdminLayout from '../layout/adminLayout';
 
 export default function CustomerReturnedProducts() {
-  const [images, setImages] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [dateFilter, setDateFilter] = useState('All');
 
-  const generateReturnId = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-    return `RET-${year}${month}${day}-${random}`;
-  };
+  const returns = [
+    { id: 'PO-RET-2025-001', customer: 'Maria Santos', reason: 'Wrong product delivered', evidence: 'wrong_item_01.jpg', quantity: 2, amount: 550.00, date: 'Oct 29, 2025', status: 'Pending' },
+    { id: 'PO-RET-2025-002', customer: 'Julian Reyes', reason: 'Allergic reaction', evidence: 'photo_allergy_02.jpg', quantity: 1, amount: 1200.00, date: 'Oct 28, 2025', status: 'Returned' },
+    { id: 'PO-RET-2025-003', customer: 'Analyn Velasco', reason: 'Product defective', evidence: 'defect_03.jpg', quantity: 3, amount: 850.00, date: 'Oct 30, 2025', status: 'Pending' },
+  ];
 
-  const returnId = generateReturnId();
+  const filteredReturns = returns.filter(item => {
+    const matchesSearch = item.id.toLowerCase().includes(searchTerm.toLowerCase()) || item.customer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
+    const matchesDate = dateFilter === 'All' || item.date.includes(dateFilter);
+    return matchesSearch && matchesStatus && matchesDate;
+  });
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      name: file.name,
-    }));
-    setImages(prev => [...prev, ...newImages]);
-  };
-
-  const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
+  const getStatusColor = (status) => status === 'Returned' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white';
 
   return (
-    <AdminLayout title="Customer Return Form">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-lg p-8 border border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Honey Dolls • Customer Return Form
-          </h1>
-          <p className="text-sm text-gray-600 mb-8">
-            Please complete the details below to record a returned order.
-          </p>
+    <AdminLayout title="">
+      <div className="max-w-7xl mx-auto space-y-8">
 
-          <form className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Customer Name
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Juan Dela Cruz"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-400 transition"
-                  placeholder="Enter customer name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Return ID
-                </label>
-                <div className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium">
-                  #{returnId}{' '}
-                  <span className="text-xs text-gray-500">(auto-generated)</span>
-                </div>
-              </div>
+        {/* Header - EXACTLY SAME */}
+        <div className="py-4">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
+              <Package className="w-8 h-8 text-orange-600" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reason for Return
-              </label>
-              <textarea
-                rows={4}
-                placeholder="Describe reason for return..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-400 resize-none transition"
+              <h1 className="text-3xl font-bold text-gray-900">Customer Returns</h1>
+              <p className="text-gray-700">Manage and process customer product returns</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search + Filters - ORIGINAL SPACING, ONLY FIXED Z-INDEX & OVERFLOW */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search order or customer..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-300 w-[350px]"
               />
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Hair Serum"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-400 transition"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity
-                </label>
-                <input
-                  type="text"
-                  defaultValue="2"
-                  readOnly
-                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-center"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Total Amount
-                </label>
-                <input
-                  type="text"
-                  defaultValue="₱950.00"
-                  readOnly
-                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-center"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Evidence (Upload Image)
-              </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-orange-400 transition">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer flex flex-col items-center gap-3"
-                >
-                  <Upload className="w-10 h-10 text-gray-400" />
-                  <div>
-                    <span className="text-sm text-gray-600 font-medium">
-                      Click to upload or drag and drop
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB</p>
-                  </div>
-                </label>
-              </div>
-
-              {images.length > 0 && (
-                <div className="mt-6 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                  {images.map((img, idx) => (
-                    <div key={idx} className="relative group">
-                      <img
-                        src={img.preview}
-                        alt={`Upload ${idx + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border shadow-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(idx)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                      <p className="text-xs text-gray-600 mt-1 truncate text-center">
-                        {img.name}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-4 pt-8 border-t border-gray-200">
-              <button
-                type="button"
-                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium"
+            {/* Status Filter - FULLY VISIBLE DROPDOWN */}
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-2 pl-3 pr-10 rounded-full border border-gray-300 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer z-[100]"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold rounded-full shadow hover:shadow-lg transition"
-              >
-                Submit Return Request
-              </button>
+                <option>All</option>
+                <option>Pending</option>
+                <option>Returned</option>
+              </select>
+              <ChevronDown className="mt-2.5 absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none z-[110]" />
             </div>
-          </form>
+
+            {/* Date Filter - FULLY VISIBLE DROPDOWN */}
+            <div className="relative">
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="px-4 py-2 pl-3 pr-10 rounded-full border border-gray-300 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer z-[100]"
+              >
+                <option>All</option>
+                <option>Oct 2025</option>
+                <option>Sep 2025</option>
+              </select>
+              <ChevronDown className="mt-2.5 absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none z-[110]" />
+            </div>
+
+          </div>
+        </div>
+
+        {/* Table - REMOVED overflow-hidden from outer card */}
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-orange-50 border-b-2 border-orange-200">
+                <tr className="text-left text-sm font-bold text-gray-700">
+                  <th className="px-6 py-5">ORDER ID</th>
+                  <th className="px-6 py-5">CUSTOMER NAME</th>
+                  <th className="px-6 py-5">REASON</th>
+                  <th className="px-6 py-5">EVIDENCE</th>
+                  <th className="px-6 py-5 text-center">QUANTITY</th>
+                  <th className="px-6 py-5 text-right">TOTAL AMOUNT</th>
+                  <th className="px-6 py-5">ORDER DATE</th>
+                  <th className="px-6 py-5 text-center">STATUS</th>
+                  <th className="px-6 py-5 text-center">ACTION</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredReturns.map((ret) => (
+                  <tr key={ret.id} className="hover:bg-orange-50 transition">
+                    <td className="px-6 py-5 font-bold text-orange-700">{ret.id}</td>
+                    <td className="px-6 py-5 font-medium text-gray-900">{ret.customer}</td>
+                    <td className="px-6 py-5 text-gray-700">{ret.reason}</td>
+                    <td className="px-6 py-5">
+                      <span className="inline-flex items-center gap-2 text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        <Eye className="w-4 h-4" />
+                        {ret.evidence}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <span className="inline-block w-10 h-10 bg-orange-100 text-orange-700 rounded-full font-bold text-lg flex items-center justify-center">
+                        {ret.quantity}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-right font-bold text-gray-900">
+                      ₱{ret.amount.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-5 text-gray-600">{ret.date}</td>
+                    <td className="px-6 py-5 text-center">
+                      <span className={`inline-block px-5 py-2 rounded-full text-white font-bold text-sm ${getStatusColor(ret.status)}`}>
+                        {ret.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {ret.status === 'Pending' ? (
+                          <>
+                            <button style={{
+
+                              
+  background: 'linear-gradient(to right, #86efac, #22d3ee)', 
+  padding: '10px 24px',
+  borderRadius: '9999px',
+  boxShadow: '0 4px 15px rgba(34, 211, 238, 0.3)',}} 
+                            className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-5 py-2 rounded-full text-sm font-bold shadow hover:shadow-lg transition hover:scale-103">
+                              Return
+                            </button>
+                            <button  style={{
+      background: 'linear-gradient(to right, #ec4899, #f97316)',
+      padding: '10px 24px',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+    }} 
+                            
+                            
+                            className="hover:scale-103 bg-gradient-to-r from-pink-400 to-red-500 text-white px-5 py-2 rounded-full text-sm font-bold shadow hover:shadow-lg transition">
+                              Replace
+                            </button>
+                          </>
+                        ) : (
+                          <button className="bg-gray-300 text-gray-700 px-10 py-2.5 rounded-full text-sm font-medium hover:scale-103">
+                            View
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </AdminLayout>
