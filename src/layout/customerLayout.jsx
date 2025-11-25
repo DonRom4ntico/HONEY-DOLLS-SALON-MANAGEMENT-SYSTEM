@@ -8,7 +8,9 @@ import {
   Settings, 
   LogOut, 
   ChevronDown,
-  Calendar // ← Added only this
+  Calendar, // ← Added only this
+  Menu,
+  X
 } from "lucide-react";
 
 export default function CustomerLayout({ children }) {
@@ -24,9 +26,9 @@ export default function CustomerLayout({ children }) {
   return (
     <div className="min-h-screen text-gray-900 font-sans">
 
-      {/* NAVBAR */}
+      {/* RESPONSIVE NAVBAR ONLY */}
       <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm z-50">
-        <div className="flex justify-between items-center px-8 md:px-16 py-5">
+        <div className="px-6 md:px-12 lg:px-16 py-5 flex items-center justify-between">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">

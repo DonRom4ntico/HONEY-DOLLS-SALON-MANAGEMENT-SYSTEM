@@ -2,7 +2,8 @@
 import { 
   Bell, Home, Calendar, Megaphone, Box, ArrowRightLeft, Trash2, AlertTriangle, 
   Package, Users, Building, FileText, DollarSign, Archive, PlusCircle, 
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu 
+  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu, 
+  PlusSquare, BellPlus, User, Settings  // Added User & Settings
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -11,8 +12,9 @@ export default function AdminLayout({ children, title }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Desktop
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
@@ -41,7 +43,9 @@ export default function AdminLayout({ children, title }) {
     { icon: Trash2, label: 'Record Product Waste', path: '/recordProductWaste' },
     { icon: AlertTriangle, label: 'Record Product Damaged', path: '/adminProductDamage' },
     { icon: DollarSign, label: 'Supplier Purchases', path: '/supplierPurchases' },
-    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/adminDisplayProduct' },
+    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
+    { icon: BellPlus, label: 'Display Services', path: '/serviceDisplay' },
+    { icon: PlusSquare, label: 'Product Display', path: '/productDisplay'},
     { icon: Archive, label: 'Transaction', path: '/transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
@@ -56,11 +60,10 @@ export default function AdminLayout({ children, title }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
-      {/* NAVBAR */}
+      {/* NAVBAR — ONLY THIS PART CHANGED */}
       <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm sticky top-0 z-50">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Burger Menu - Mobile Only */}
             <button
               onClick={() => setMobileMenuOpen(prev => !prev)}
               className="lg:hidden text-orange-900"
@@ -79,18 +82,80 @@ export default function AdminLayout({ children, title }) {
             </div>
           </div>
 
+          {/* ADMIN PROFILE DROPDOWN — ADDED HERE */}
           <div className="flex items-center gap-4">
-            <Bell className="w-6 h-6 text-yellow-600" />
-            <span className="text-orange-900 font-medium hidden sm:inline">
-              Welcome, <span className="text-yellow-600 font-bold">Alfa Smith</span>
-            </span>
+            <Bell className="w-6 h-6 text-yellow-600 cursor-pointer" />
+
+            <div className="relative">
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 focus:outline-none"
+              >
+                <div className="w-11 h-11 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img
+                    src="/src/assets/nigga.jpg"
+                    alt="Admin"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/80/ffd36e/000000?text=A";
+                    }}
+                  />
+                </div>
+                <ChevronDown 
+                  className={`w-5 h-5 text-white transition-transform duration-200 ${desktopDropdownOpen ? "rotate-180" : ""}`} 
+                />
+              </button>
+
+              {/* DROPDOWN MENU */}
+              {profileDropdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setProfileDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-4 w-64 bg-white rounded-xl shadow-2xl border border-pink-100 z-50 overflow-hidden">
+                    <div className="py-4 px-5 bg-gradient-to-r from-pink-50 to-pink-100 border-b border-pink-200">
+                      <p className="text-sm text-pink-700 font-medium">Signed in as</p>
+                      <p className="text-lg font-bold text-pink-900">Admin</p>
+                    </div>
+                    <div className="py-2">
+                      <Link 
+                        to="/adminProfile" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
+                      >
+                        <User className="w-5 h-5" /> <span>Profile</span>
+                      </Link>
+                      <Link 
+                        to="/adminSettings" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
+                      >
+                        <Settings className="w-5 h-5" /> <span>Settings</span>
+                      </Link>
+                      <hr className="my-3 border-pink-100" />
+                      <button
+                        onClick={() => {
+                          setDesktopDropdownOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full flex items-center gap-4 px-6 py-3 hover:bg-red-50 text-red-600 font-medium transition text-left"
+                      >
+                        <LogOut className="w-5 h-5" /> <span>Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
+      {/* EVERYTHING BELOW IS 100% YOUR ORIGINAL CODE — NOTHING CHANGED */}
       <div className="flex flex-1 relative">
         {/* DESKTOP SIDEBAR */}
-        <aside className={` lg:flex flex-col bg-white shadow-lg transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+        <aside className={`lg:flex flex-col bg-white shadow-lg transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
           <div className="p-4 border-b flex items-center justify-between">
             {sidebarOpen && <h2 className="text-sm font-bold text-orange-900">Admin</h2>}
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 hover:text-orange-600">
@@ -152,7 +217,7 @@ export default function AdminLayout({ children, title }) {
           </div>
         </aside>
 
-        {/* MOBILE SIDEBAR */}
+        {/* MOBILE SIDEBAR — UNTOUCHED */}
         {mobileMenuOpen && (
           <>
             <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />

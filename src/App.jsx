@@ -29,13 +29,16 @@ import RecordProductWaste from "./pages/recordProductWaste";
 import CustomerReturnedProducts from "./pages/customerReturnedProducts";
 import AdminProductDamage from "./pages/adminProductDamage";
 import AdminAnnouncement from "./pages/adminAnnouncement";
-import AdminDisplayProduct from "./pages/adminDisplayProduct";
+import SupplierPurchaseRecord from "./pages/supplierPurRecord";
 import MyAppointment from "./pages/myAppointment";
 import About from "./pages/about";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Transaction from "./pages/Transaction";
 import SupplierPurchases from "./pages/supplierPurchases";
+import ProductDisplay from "./pages/productDisplay";
+import Inventory from "./pages/inventory";
+import ServiceDisplay from "./pages/serviceDisplay";
 
 
 function App() {
@@ -67,13 +70,16 @@ function App() {
         <Route path="/customerReturnedProducts" element={<CustomerReturnedProducts />} />
         <Route path="/adminProductDamage" element={<AdminProductDamage />} />
         <Route path="/adminAnnouncement" element={<AdminAnnouncement />} />
-        <Route path="/adminDisplayProduct" element={<AdminDisplayProduct />} />
+        <Route path="/supplierPurRecord" element={<SupplierPurchaseRecord />} />
         <Route path="/myAppointment" element={<MyAppointment />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/Transaction" element={<Transaction />} />
         <Route path="/supplierPurchases" element={<SupplierPurchases />} />
+        <Route path="/productDisplay" element={<ProductDisplay />} /> 
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/serviceDisplay" element={<ServiceDisplay />} />
         
 
       </Routes>
