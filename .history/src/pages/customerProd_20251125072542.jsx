@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CustomerLayout from "../layout/customerLayout";
-import { X, Minus, Plus, SlidersHorizontal } from "lucide-react";
+import { X, Minus, Plus } from "lucide-react";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
@@ -10,9 +10,6 @@ const CustomerProd = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const categories = ["Skin Care", "Hair Care", "Body Care", "Cosmetics"];
 
   // 👉 Fetch products
   useEffect(() => {
@@ -24,10 +21,11 @@ const CustomerProd = () => {
         console.error("Failed to load products:", err);
       }
     };
+
     fetchProducts();
   }, []);
 
-  // 👉 Category Filter Logic
+  // 👉 Category filter logic
   const handleCategoryChange = (category) => {
     if (selectedCategories.includes(category)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== category));
@@ -43,19 +41,7 @@ const CustomerProd = () => {
 
   return (
     <CustomerLayout>
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 pt-20 px-4 md:px-10">
-        {/* ⭐ FILTERS BUTTON */}
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => setIsFilterOpen(true)}
-            className="bg-white border border-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow hover:bg-gray-100 transition"
-          >
-            <SlidersHorizontal size={18} />
-            Filters
-          </button>
-        </div>
-
-        {/* ⭐ PRODUCT GRID */}
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 pt-20">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {filteredProducts.map((product) => (
             <div
@@ -92,55 +78,6 @@ const CustomerProd = () => {
           ))}
         </div>
       </div>
-
-      {/* ⭐ SIDEBAR FILTER PANEL ⭐ */}
-      {isFilterOpen && (
-        <div className="fixed inset-0 flex z-50">
-          {/* Dark overlay */}
-          <div
-            className="flex-1 bg-black bg-opacity-40"
-            onClick={() => setIsFilterOpen(false)}
-          ></div>
-
-          {/* Sidebar */}
-          <div className="w-64 bg-white p-5 shadow-xl animate-slide-left">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-800">Filters</h2>
-              <button
-                onClick={() => setIsFilterOpen(false)}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <X />
-              </button>
-            </div>
-
-            <h3 className="font-semibold mb-2">Category</h3>
-
-            {/* Category checkboxes */}
-            <div className="flex flex-col gap-2">
-              {categories.map((category) => (
-                <label key={category} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category)}
-                    onChange={() => handleCategoryChange(category)}
-                    className="accent-[#f97316]"
-                  />
-                  <span className="text-gray-700">{category}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Reset Button */}
-            <button
-              className="mt-6 w-full bg-gray-200 hover:bg-gray-300 py-2 rounded-lg text-sm font-semibold"
-              onClick={() => setSelectedCategories([])}
-            >
-              Reset Filters
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* ⭐ PRODUCT MODAL ⭐ */}
       {selectedProduct && (
@@ -197,12 +134,14 @@ const CustomerProd = () => {
               </button>
             </div>
 
-            {/* ⭐ ACTION BUTTONS */}
+            {/* ACTION BUTTONS */}
             <div className="mt-6 flex gap-3">
+              {/* Add to Cart */}
               <button className="w-1/2 bg-[#fca9a9] hover:bg-[#fb8d8d] text-white py-3 rounded-lg font-semibold transition">
                 Add to Cart
               </button>
 
+              {/* Buy Now */}
               <button className="w-1/2 bg-[#f97316] hover:bg-[#fb7c1d] text-white py-3 rounded-lg font-semibold transition">
                 Buy Now
               </button>
