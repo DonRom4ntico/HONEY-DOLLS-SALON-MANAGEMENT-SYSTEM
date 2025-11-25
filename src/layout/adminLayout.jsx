@@ -2,7 +2,8 @@
 import { 
   Bell, Home, Calendar, Megaphone, Box, ArrowRightLeft, Trash2, AlertTriangle, 
   Package, Users, Building, FileText, DollarSign, Archive, PlusCircle, 
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu 
+  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu, 
+  PlusSquare
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -41,7 +42,8 @@ export default function AdminLayout({ children, title }) {
     { icon: Trash2, label: 'Record Product Waste', path: '/recordProductWaste' },
     { icon: AlertTriangle, label: 'Record Product Damaged', path: '/adminProductDamage' },
     { icon: DollarSign, label: 'Supplier Purchases', path: '/supplierPurchases' },
-    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/adminDisplayProduct' },
+    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
+    { icon: PlusSquare, label: 'Product Display', path: '/productDisplay'},
     { icon: Archive, label: 'Transaction', path: '/transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
