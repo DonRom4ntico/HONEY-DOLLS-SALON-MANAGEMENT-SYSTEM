@@ -170,6 +170,7 @@ const Custapp = () => {
     : 0;
 
   return (
+    <CusomterLayout>
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
       <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -435,6 +436,7 @@ const Custapp = () => {
         </div>
       )}
     </div>
+    </CusomterLayout>
   );
 };
 

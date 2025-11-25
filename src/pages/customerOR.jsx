@@ -1,5 +1,6 @@
 // src/pages/CustomerOR.jsx
 import { Bell, Printer } from 'lucide-react';
+import CustomerLayout from '../layout/customerLayout';
 
 export default function CustomerOR() {
   const receipt = {
@@ -20,6 +21,7 @@ export default function CustomerOR() {
   };
 
   return (
+    <CustomerLayout>
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
 
       {/* ====================== HEADER ====================== */}
@@ -154,5 +156,6 @@ export default function CustomerOR() {
         </div>
       </footer>
     </div>
+    </CustomerLayout>
   );
 }

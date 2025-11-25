@@ -1,5 +1,6 @@
 import { Bell, Upload, X } from 'lucide-react';
 import { useState } from 'react';
+import CustomerLayout from '../layout/customerLayout';
 
 export default function CustomerReturnForm() {
   const [images, setImages] = useState([]);
@@ -30,6 +31,7 @@ export default function CustomerReturnForm() {
   };
 
   return (
+    <CustomerLayout>
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
       {/* HEADER */}
       <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e]">
@@ -193,5 +195,6 @@ export default function CustomerReturnForm() {
         </div>
       </footer>
     </div>
+    </CustomerLayout>
   );
 }

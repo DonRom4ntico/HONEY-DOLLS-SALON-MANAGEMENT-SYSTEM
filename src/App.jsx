@@ -37,6 +37,8 @@ import Settings from "./pages/settings";
 import Transaction from "./pages/Transaction";
 import SupplierPurchases from "./pages/supplierPurchases";
 import ProductDisplay from "./pages/productDisplay";
+import Inventory from "./pages/inventory";
+import ServiceDisplay from "./pages/serviceDisplay";
 
 
 function App() {
@@ -76,6 +78,8 @@ function App() {
         <Route path="/Transaction" element={<Transaction />} />
         <Route path="/supplierPurchases" element={<SupplierPurchases />} />
         <Route path="/productDisplay" element={<ProductDisplay />} /> 
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/serviceDisplay" element={<ServiceDisplay />} />
         
 
       </Routes>

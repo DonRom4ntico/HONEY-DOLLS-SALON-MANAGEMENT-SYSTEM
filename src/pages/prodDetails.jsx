@@ -1,5 +1,6 @@
 import { Bell, X, Star, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
+import CustomerLayout from '../layout/customerLayout';
 
 export default function App() {
   const [quantity, setQuantity] = useState(1);
@@ -14,6 +15,7 @@ export default function App() {
   };
 
   return (
+    <CustomerLayout>
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
 
       {/* ====================== HEADER ====================== */}
@@ -141,5 +143,6 @@ export default function App() {
         </div>
       </footer>
     </div>
+    </CustomerLayout>
   );
 }
