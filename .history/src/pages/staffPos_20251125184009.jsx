@@ -93,7 +93,6 @@ export default function StaffPOS() {
     setCart([]);
     setAmountPaid(0);
     setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
   };
 
   // ---------------- Print Receipt (new reliable method) ----------------
@@ -124,6 +123,7 @@ export default function StaffPOS() {
     printWindow.onload = () => {
       printWindow.focus();
       printWindow.print();
+      printWindow.close();
     };
   };
 
@@ -157,9 +157,8 @@ export default function StaffPOS() {
         orderid: orderId,
         reference_code: referenceCode,
         partialamountpaid: total,
-        method: paymentMethod, // <- already handled
+        method: paymentMethod,
       };
-
       await axios.post(`${API_BASE}/customerpayment`, paymentPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -171,6 +170,7 @@ export default function StaffPOS() {
       );
 
       // Print receipt after payment
+      printReceipt();
 
       setAmountPaidInput("");
     } catch (err) {
@@ -391,30 +391,6 @@ export default function StaffPOS() {
                 placeholder="Enter amount received"
                 className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-orange-400"
               />
-            </div>
-            {/* PAYMENT METHOD SELECTOR */}
-            <div className="mt-4">
-              <span className="block text-sm font-medium text-gray-700 mb-1">
-                Payment Method
-              </span>
-              <div className="flex gap-4">
-                {["Cash", "Gcash", "Credit Card"].map((method) => (
-                  <label
-                    key={method}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={paymentMethod === method}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    {method}
-                  </label>
-                ))}
-              </div>
             </div>
 
             {/* BUTTONS */}

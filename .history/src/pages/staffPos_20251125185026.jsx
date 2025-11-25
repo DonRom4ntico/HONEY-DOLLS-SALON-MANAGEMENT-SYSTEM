@@ -171,6 +171,7 @@ export default function StaffPOS() {
       );
 
       // Print receipt after payment
+      printReceipt();
 
       setAmountPaidInput("");
     } catch (err) {

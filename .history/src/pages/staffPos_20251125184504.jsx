@@ -93,7 +93,6 @@ export default function StaffPOS() {
     setCart([]);
     setAmountPaid(0);
     setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
   };
 
   // ---------------- Print Receipt (new reliable method) ----------------
@@ -171,6 +170,7 @@ export default function StaffPOS() {
       );
 
       // Print receipt after payment
+      printReceipt();
 
       setAmountPaidInput("");
     } catch (err) {

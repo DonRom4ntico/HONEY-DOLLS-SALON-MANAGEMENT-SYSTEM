@@ -1,4 +1,4 @@
-import { Bell, Search, Printer } from "lucide-react";
+import { Bell, Search, Plus, Minus, Trash2, Printer } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
@@ -9,8 +9,7 @@ export default function StaffPOS() {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [services, setServices] = useState([]);
-  const [amountPaidInput, setAmountPaidInput] = useState("");
-  const [amountPaid, setAmountPaid] = useState(0);
+  const [amountPaid, setAmountPaid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [referenceCode, setReferenceCode] = useState(Date.now());
 
@@ -33,7 +32,7 @@ export default function StaffPOS() {
     fetchData();
   }, []);
 
-  // ---------------- Cart Calculations ----------------
+  // ---------------- Cart Helpers ----------------
   const subtotal = cart.reduce(
     (sum, item) => sum + item.unit_price * item.quantity,
     0
@@ -43,7 +42,6 @@ export default function StaffPOS() {
   const total = subtotal + vat;
   const change = amountPaid ? Number(amountPaid) - total : 0;
 
-  // ---------------- Cart Helpers ----------------
   const addToCart = (item, type) => {
     const existing = cart.find(
       (i) => i.id === (item.serviceid || item.productid) && i.type === type
@@ -65,7 +63,11 @@ export default function StaffPOS() {
           unit_price: Number(item.amount || item.price),
           type,
           quantity: 1,
-          image: item.prodimage || null,
+          image:
+            item.prodimage?.startsWith("http") ||
+            item.prodimage?.startsWith("/")
+              ? item.prodimage
+              : `${API_BASE}/${item.prodimage}`,
         },
       ]);
     }
@@ -85,58 +87,32 @@ export default function StaffPOS() {
     );
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
-  };
+  const removeFromCart = (id) => setCart(cart.filter((item) => item.id !== id));
+  const clearCart = () => setCart([]);
 
-  const clearCart = () => {
-    setCart([]);
-    setAmountPaid(0);
-    setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
-  };
-
-  // ---------------- Print Receipt (new reliable method) ----------------
-  const printReceipt = () => {
-    if (!receiptRef.current) return alert("Receipt is not ready yet!");
-
-    const receiptHTML = receiptRef.current.innerHTML;
-    const printWindow = window.open("", "_blank", "width=400,height=600");
-    printWindow.document.write(`
-    <html>
-      <head>
-        <title>Receipt - ${referenceCode}</title>
-        <style>
-          body { font-family: sans-serif; padding: 10px; }
-          .text-center { text-align: center; }
-          .font-bold { font-weight: bold; }
-          .text-sm { font-size: 0.875rem; }
-          .text-xs { font-size: 0.75rem; }
-          hr { border: 1px solid #ccc; margin: 8px 0; }
-        </style>
-      </head>
-      <body>${receiptHTML}</body>
-    </html>
-  `);
+  // ---------------- Print Receipt ----------------
+  const handlePrint = () => {
+    if (!receiptRef.current) return;
+    const printContents = receiptRef.current.innerHTML;
+    const printWindow = window.open("", "", "width=600,height=800");
+    printWindow.document.write(
+      "<html><head><title>Receipt</title></head><body>"
+    );
+    printWindow.document.write(printContents);
+    printWindow.document.write("</body></html>");
     printWindow.document.close();
-
-    // ✅ Wait until the window loads completely
-    printWindow.onload = () => {
-      printWindow.focus();
-      printWindow.print();
-    };
+    printWindow.focus();
+    printWindow.print();
   };
 
   // ---------------- CONFIRM & PAY ----------------
   const handleConfirmPay = async () => {
     if (cart.length === 0) return alert("Cart is empty!");
-    if (!amountPaidInput || Number(amountPaidInput) < total)
+    if (!amountPaid || Number(amountPaid) < total)
       return alert("Amount paid is not enough!");
 
     try {
       const token = localStorage.getItem("token");
-
-      setAmountPaid(Number(amountPaidInput));
 
       // 1️⃣ Create Order
       const orderPayload = {
@@ -147,9 +123,11 @@ export default function StaffPOS() {
           unit_price: i.unit_price,
         })),
       };
+
       const orderRes = await axios.post(`${API_BASE}/orders`, orderPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const orderId = orderRes.data.orderid;
 
       // 2️⃣ Insert Payment
@@ -157,7 +135,7 @@ export default function StaffPOS() {
         orderid: orderId,
         reference_code: referenceCode,
         partialamountpaid: total,
-        method: paymentMethod, // <- already handled
+        method: paymentMethod,
       };
 
       await axios.post(`${API_BASE}/customerpayment`, paymentPayload, {
@@ -170,16 +148,15 @@ export default function StaffPOS() {
         )}`
       );
 
-      // Print receipt after payment
-
-      setAmountPaidInput("");
+      // After payment, cart stays so receipt can still be printed
+      setReferenceCode(Date.now()); // generate new reference for next order
+      setAmountPaid("");
     } catch (err) {
       console.error(err);
       alert("Payment failed: " + (err.response?.data?.message || err.message));
     }
   };
 
-  // ---------------- RENDER ----------------
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
       {/* HEADER */}
@@ -233,6 +210,7 @@ export default function StaffPOS() {
               </div>
             </div>
 
+            {/* Grid 2 columns */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[...services, ...products]
                 .filter((item) => {
@@ -243,9 +221,13 @@ export default function StaffPOS() {
                   const type = item.serviceid ? "service" : "product";
                   const name = item.servicename || item.prodname;
                   const price = item.amount || item.price;
-                  const image = item.prodimage
-                    ? `${API_BASE}/${item.prodimage}`
-                    : null;
+                  const image =
+                    item.prodimage?.startsWith("http") ||
+                    item.prodimage?.startsWith("/")
+                      ? item.prodimage
+                      : item.prodimage
+                      ? `${API_BASE}/${item.prodimage}`
+                      : null;
 
                   const added = cart.reduce((acc, i) => {
                     if (i.id === (item.serviceid || item.productid))
@@ -291,134 +273,108 @@ export default function StaffPOS() {
 
           {/* RIGHT: Cart/Receipt */}
           <div className="bg-gray-50 rounded-2xl p-5 flex flex-col h-full overflow-y-auto">
-            {/* RECEIPT */}
-            <div
-              ref={receiptRef}
-              className="p-4 bg-white text-gray-900 rounded-2xl print:w-[300px] print:p-2 print:shadow-none"
-            >
-              <div className="text-center mb-4">
-                <img
-                  src="/src/assets/honeydolls.jpg"
-                  alt="Honey Dolls"
-                  className="w-16 h-16 mx-auto rounded-full object-cover mb-2"
-                />
-                <h2 className="font-bold text-lg">Honey Dolls & Brilliant</h2>
-                <p className="text-sm text-gray-600">Beauty Hub — Davao</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Reference Code:{" "}
-                  <span className="font-medium">{referenceCode}</span>
-                </p>
-              </div>
+            <div ref={receiptRef}>
+              <h3 className="font-bold text-gray-900 mb-2">Cart / Receipt</h3>
+              <p className="text-sm mb-2">Reference Code: {referenceCode}</p>
 
-              <hr className="border-gray-300 my-2" />
-
-              <div className="space-y-2 mb-2">
+              {/* CART ITEMS */}
+              <div className="space-y-2 mb-4">
                 {cart.length === 0 ? (
-                  <p className="text-center text-gray-500 text-sm py-4">
+                  <p className="text-center text-gray-500 text-sm py-8">
                     Cart is empty
                   </p>
                 ) : (
                   cart.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <div>
-                        <p className="font-medium">
-                          {item.quantity} x {item.name}
-                        </p>
+                    <div
+                      key={item.id}
+                      className="bg-white rounded-xl p-3 flex items-center justify-between text-sm"
+                    >
+                      <div className="flex-1 flex items-center gap-2">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        )}
+                        <div>
+                          <p className="font-medium">
+                            {item.quantity} x {item.name}
+                          </p>
+                          <p className="text-gray-600">
+                            ₱{(item.quantity * item.unit_price).toFixed(2)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p>₱{(item.quantity * item.unit_price).toFixed(2)}</p>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => updateQty(item.id, -1)}
+                          className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-6 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQty(item.id, 1)}
+                          className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="ml-2 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   ))
                 )}
               </div>
 
-              <hr className="border-gray-300 my-2" />
-
-              <div className="text-sm space-y-1">
+              {/* TOTALS */}
+              <div className="border-t pt-3 mb-4 space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>₱{subtotal.toFixed(2)}</span>
                 </div>
+
                 <div className="flex justify-between">
                   <span>VAT (12%)</span>
                   <span>₱{vat.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-md mt-1">
+
+                <div className="flex justify-between font-bold text-lg pt-1">
                   <span>Total</span>
                   <span>₱{total.toFixed(2)}</span>
                 </div>
               </div>
 
-              <hr className="border-gray-300 my-2" />
+              {/* AMOUNT PAID */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount Paid
+                </label>
+                <input
+                  type="number"
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-400 text-sm"
+                />
+              </div>
 
-              <div className="text-sm space-y-1">
-                <div className="flex justify-between">
-                  <span>Amount Paid</span>
-                  <span>₱{amountPaid.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
+              {/* CHANGE */}
+              {amountPaid && (
+                <div className="flex justify-between text-md font-semibold text-green-700 mb-4">
                   <span>Change</span>
                   <span>₱{change.toFixed(2)}</span>
                 </div>
-              </div>
-
-              <hr className="border-gray-300 my-2" />
-
-              <div className="text-sm">
-                <p>
-                  Payment Method:{" "}
-                  <span className="font-medium">{paymentMethod}</span>
-                </p>
-              </div>
-
-              <hr className="border-gray-300 my-2" />
-
-              <div className="text-center text-xs text-gray-500 mt-2">
-                Thank you for visiting Honey Dolls & Brilliant!
-              </div>
-            </div>
-
-            {/* AMOUNT PAID INPUT */}
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount Paid
-              </label>
-              <input
-                type="number"
-                value={amountPaidInput}
-                onChange={(e) => setAmountPaidInput(e.target.value)}
-                placeholder="Enter amount received"
-                className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-orange-400"
-              />
-            </div>
-            {/* PAYMENT METHOD SELECTOR */}
-            <div className="mt-4">
-              <span className="block text-sm font-medium text-gray-700 mb-1">
-                Payment Method
-              </span>
-              <div className="flex gap-4">
-                {["Cash", "Gcash", "Credit Card"].map((method) => (
-                  <label
-                    key={method}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={paymentMethod === method}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    {method}
-                  </label>
-                ))}
-              </div>
+              )}
             </div>
 
             {/* BUTTONS */}
-            <div className="space-y-3 mt-4">
+            <div className="space-y-3">
               <button
                 onClick={handleConfirmPay}
                 disabled={cart.length === 0}
@@ -428,7 +384,8 @@ export default function StaffPOS() {
               </button>
 
               <button
-                onClick={printReceipt}
+                onClick={handlePrint}
+                disabled={cart.length === 0}
                 className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition font-medium text-sm"
               >
                 <Printer className="w-4 h-4" /> Print Receipt

@@ -93,7 +93,6 @@ export default function StaffPOS() {
     setCart([]);
     setAmountPaid(0);
     setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
   };
 
   // ---------------- Print Receipt (new reliable method) ----------------
@@ -157,9 +156,8 @@ export default function StaffPOS() {
         orderid: orderId,
         reference_code: referenceCode,
         partialamountpaid: total,
-        method: paymentMethod, // <- already handled
+        method: paymentMethod,
       };
-
       await axios.post(`${API_BASE}/customerpayment`, paymentPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -171,6 +169,7 @@ export default function StaffPOS() {
       );
 
       // Print receipt after payment
+      printReceipt();
 
       setAmountPaidInput("");
     } catch (err) {

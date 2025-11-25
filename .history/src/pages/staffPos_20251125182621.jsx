@@ -1,6 +1,7 @@
-import { Bell, Search, Printer } from "lucide-react";
+import { Bell, Search, Plus, Minus, Trash2, Printer } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useReactToPrint } from "react-to-print";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -16,24 +17,6 @@ export default function StaffPOS() {
 
   const receiptRef = useRef();
 
-  // ---------------- Fetch Products & Services ----------------
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [prodRes, servRes] = await Promise.all([
-          axios.get(`${API_BASE}/products`),
-          axios.get(`${API_BASE}/services`),
-        ]);
-        setProducts(prodRes.data.products);
-        setServices(servRes.data.services);
-      } catch (err) {
-        console.error("Failed to fetch products/services:", err);
-      }
-    };
-    fetchData();
-  }, []);
-
-  // ---------------- Cart Calculations ----------------
   const subtotal = cart.reduce(
     (sum, item) => sum + item.unit_price * item.quantity,
     0
@@ -43,7 +26,6 @@ export default function StaffPOS() {
   const total = subtotal + vat;
   const change = amountPaid ? Number(amountPaid) - total : 0;
 
-  // ---------------- Cart Helpers ----------------
   const addToCart = (item, type) => {
     const existing = cart.find(
       (i) => i.id === (item.serviceid || item.productid) && i.type === type
@@ -71,63 +53,17 @@ export default function StaffPOS() {
     }
   };
 
-  const updateQty = (id, delta) => {
-    setCart(
-      cart
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean)
-    );
-  };
-
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
-  };
-
   const clearCart = () => {
     setCart([]);
     setAmountPaid(0);
     setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
   };
 
-  // ---------------- Print Receipt (new reliable method) ----------------
-  const printReceipt = () => {
-    if (!receiptRef.current) return alert("Receipt is not ready yet!");
+  const handlePrint = useReactToPrint({
+    content: () => receiptRef.current,
+    documentTitle: `Receipt-${referenceCode}`,
+  });
 
-    const receiptHTML = receiptRef.current.innerHTML;
-    const printWindow = window.open("", "_blank", "width=400,height=600");
-    printWindow.document.write(`
-    <html>
-      <head>
-        <title>Receipt - ${referenceCode}</title>
-        <style>
-          body { font-family: sans-serif; padding: 10px; }
-          .text-center { text-align: center; }
-          .font-bold { font-weight: bold; }
-          .text-sm { font-size: 0.875rem; }
-          .text-xs { font-size: 0.75rem; }
-          hr { border: 1px solid #ccc; margin: 8px 0; }
-        </style>
-      </head>
-      <body>${receiptHTML}</body>
-    </html>
-  `);
-    printWindow.document.close();
-
-    // ✅ Wait until the window loads completely
-    printWindow.onload = () => {
-      printWindow.focus();
-      printWindow.print();
-    };
-  };
-
-  // ---------------- CONFIRM & PAY ----------------
   const handleConfirmPay = async () => {
     if (cart.length === 0) return alert("Cart is empty!");
     if (!amountPaidInput || Number(amountPaidInput) < total)
@@ -138,7 +74,6 @@ export default function StaffPOS() {
 
       setAmountPaid(Number(amountPaidInput));
 
-      // 1️⃣ Create Order
       const orderPayload = {
         items: cart.map((i) => ({
           productid: i.type === "product" ? i.id : null,
@@ -147,17 +82,18 @@ export default function StaffPOS() {
           unit_price: i.unit_price,
         })),
       };
+
       const orderRes = await axios.post(`${API_BASE}/orders`, orderPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const orderId = orderRes.data.orderid;
 
-      // 2️⃣ Insert Payment
       const paymentPayload = {
         orderid: orderId,
         reference_code: referenceCode,
         partialamountpaid: total,
-        method: paymentMethod, // <- already handled
+        method: paymentMethod,
       };
 
       await axios.post(`${API_BASE}/customerpayment`, paymentPayload, {
@@ -170,8 +106,6 @@ export default function StaffPOS() {
         )}`
       );
 
-      // Print receipt after payment
-
       setAmountPaidInput("");
     } catch (err) {
       console.error(err);
@@ -179,36 +113,25 @@ export default function StaffPOS() {
     }
   };
 
-  // ---------------- RENDER ----------------
+  // ---------------- Fetch Products & Services ----------------
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [prodRes, servRes] = await Promise.all([
+          axios.get(`${API_BASE}/products`),
+          axios.get(`${API_BASE}/services`),
+        ]);
+        setProducts(prodRes.data.products);
+        setServices(servRes.data.services);
+      } catch (err) {
+        console.error("Failed to fetch products/services:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
-      {/* HEADER */}
-      <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/src/assets/honeydolls.jpg"
-              alt="Honey Dolls"
-              className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-            <div>
-              <h1 className="text-xl font-bold text-orange-900">
-                Honey Dolls & Brilliant
-              </h1>
-              <p className="text-sm text-orange-800 font-medium">
-                Beauty Hub — Davao
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Bell className="w-6 h-6 text-yellow-600" />
-            <span className="text-orange-900 font-medium text-sm hidden sm:inline">
-              Logged in: <span className="text-yellow-600">Anna (Staff)</span>
-            </span>
-          </div>
-        </div>
-      </header>
-
       {/* MAIN */}
       <main className="flex-1 px-6 py-8 max-w-7xl mx-auto w-full">
         <div className="grid lg:grid-cols-[2fr_1fr] gap-8 h-[calc(100vh-100px)]">
@@ -219,7 +142,6 @@ export default function StaffPOS() {
                 <h2 className="text-lg font-bold text-gray-900">
                   Honey Dolls • Staff POS
                 </h2>
-                <p className="text-sm text-gray-600">Services & Products</p>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -246,13 +168,13 @@ export default function StaffPOS() {
                   const image = item.prodimage
                     ? `${API_BASE}/${item.prodimage}`
                     : null;
-
-                  const added = cart.reduce((acc, i) => {
-                    if (i.id === (item.serviceid || item.productid))
-                      return i.quantity;
-                    return acc;
-                  }, 0);
-
+                  const added = cart.reduce(
+                    (acc, i) =>
+                      i.id === (item.serviceid || item.productid)
+                        ? i.quantity
+                        : acc,
+                    0
+                  );
                   return (
                     <div
                       key={`${type}-${item.serviceid || item.productid}`}
@@ -291,27 +213,17 @@ export default function StaffPOS() {
 
           {/* RIGHT: Cart/Receipt */}
           <div className="bg-gray-50 rounded-2xl p-5 flex flex-col h-full overflow-y-auto">
-            {/* RECEIPT */}
             <div
               ref={receiptRef}
               className="p-4 bg-white text-gray-900 rounded-2xl print:w-[300px] print:p-2 print:shadow-none"
             >
               <div className="text-center mb-4">
-                <img
-                  src="/src/assets/honeydolls.jpg"
-                  alt="Honey Dolls"
-                  className="w-16 h-16 mx-auto rounded-full object-cover mb-2"
-                />
                 <h2 className="font-bold text-lg">Honey Dolls & Brilliant</h2>
-                <p className="text-sm text-gray-600">Beauty Hub — Davao</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Reference Code:{" "}
-                  <span className="font-medium">{referenceCode}</span>
+                  Reference: {referenceCode}
                 </p>
               </div>
-
               <hr className="border-gray-300 my-2" />
-
               <div className="space-y-2 mb-2">
                 {cart.length === 0 ? (
                   <p className="text-center text-gray-500 text-sm py-4">
@@ -332,9 +244,7 @@ export default function StaffPOS() {
                   ))
                 )}
               </div>
-
               <hr className="border-gray-300 my-2" />
-
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -349,9 +259,7 @@ export default function StaffPOS() {
                   <span>₱{total.toFixed(2)}</span>
                 </div>
               </div>
-
               <hr className="border-gray-300 my-2" />
-
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span>Amount Paid</span>
@@ -362,28 +270,9 @@ export default function StaffPOS() {
                   <span>₱{change.toFixed(2)}</span>
                 </div>
               </div>
-
-              <hr className="border-gray-300 my-2" />
-
-              <div className="text-sm">
-                <p>
-                  Payment Method:{" "}
-                  <span className="font-medium">{paymentMethod}</span>
-                </p>
-              </div>
-
-              <hr className="border-gray-300 my-2" />
-
-              <div className="text-center text-xs text-gray-500 mt-2">
-                Thank you for visiting Honey Dolls & Brilliant!
-              </div>
             </div>
 
-            {/* AMOUNT PAID INPUT */}
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount Paid
-              </label>
               <input
                 type="number"
                 value={amountPaidInput}
@@ -392,43 +281,21 @@ export default function StaffPOS() {
                 className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-orange-400"
               />
             </div>
-            {/* PAYMENT METHOD SELECTOR */}
-            <div className="mt-4">
-              <span className="block text-sm font-medium text-gray-700 mb-1">
-                Payment Method
-              </span>
-              <div className="flex gap-4">
-                {["Cash", "Gcash", "Credit Card"].map((method) => (
-                  <label
-                    key={method}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={paymentMethod === method}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    {method}
-                  </label>
-                ))}
-              </div>
-            </div>
 
-            {/* BUTTONS */}
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmPay}
-                disabled={cart.length === 0}
-                className="w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md"
               >
                 Confirm & Pay
               </button>
 
+              {/* PRINT BUTTON FIXED */}
               <button
-                onClick={printReceipt}
+                onClick={() => {
+                  if (receiptRef.current) handlePrint();
+                  else alert("Receipt is not ready yet!");
+                }}
                 className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition font-medium text-sm"
               >
                 <Printer className="w-4 h-4" /> Print Receipt

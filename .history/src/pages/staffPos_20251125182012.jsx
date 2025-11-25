@@ -1,6 +1,7 @@
 import { Bell, Search, Printer } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useReactToPrint } from "react-to-print";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -10,7 +11,7 @@ export default function StaffPOS() {
   const [products, setProducts] = useState([]);
   const [services, setServices] = useState([]);
   const [amountPaidInput, setAmountPaidInput] = useState("");
-  const [amountPaid, setAmountPaid] = useState(0);
+  const [amountPaid, setAmountPaid] = useState(0); // confirmed value for receipt
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [referenceCode, setReferenceCode] = useState(Date.now());
 
@@ -33,7 +34,7 @@ export default function StaffPOS() {
     fetchData();
   }, []);
 
-  // ---------------- Cart Calculations ----------------
+  // ---------------- Cart Helpers ----------------
   const subtotal = cart.reduce(
     (sum, item) => sum + item.unit_price * item.quantity,
     0
@@ -43,7 +44,6 @@ export default function StaffPOS() {
   const total = subtotal + vat;
   const change = amountPaid ? Number(amountPaid) - total : 0;
 
-  // ---------------- Cart Helpers ----------------
   const addToCart = (item, type) => {
     const existing = cart.find(
       (i) => i.id === (item.serviceid || item.productid) && i.type === type
@@ -93,39 +93,14 @@ export default function StaffPOS() {
     setCart([]);
     setAmountPaid(0);
     setAmountPaidInput("");
-    setReferenceCode(Date.now()); // <-- generate new reference code
   };
 
-  // ---------------- Print Receipt (new reliable method) ----------------
-  const printReceipt = () => {
-    if (!receiptRef.current) return alert("Receipt is not ready yet!");
-
-    const receiptHTML = receiptRef.current.innerHTML;
-    const printWindow = window.open("", "_blank", "width=400,height=600");
-    printWindow.document.write(`
-    <html>
-      <head>
-        <title>Receipt - ${referenceCode}</title>
-        <style>
-          body { font-family: sans-serif; padding: 10px; }
-          .text-center { text-align: center; }
-          .font-bold { font-weight: bold; }
-          .text-sm { font-size: 0.875rem; }
-          .text-xs { font-size: 0.75rem; }
-          hr { border: 1px solid #ccc; margin: 8px 0; }
-        </style>
-      </head>
-      <body>${receiptHTML}</body>
-    </html>
-  `);
-    printWindow.document.close();
-
-    // ✅ Wait until the window loads completely
-    printWindow.onload = () => {
-      printWindow.focus();
-      printWindow.print();
-    };
-  };
+  // ---------------- Print Receipt ----------------
+  const handlePrint = useReactToPrint({
+    content: () => receiptRef.current,
+    documentTitle: `Receipt-${referenceCode}`,
+    removeAfterPrint: false,
+  });
 
   // ---------------- CONFIRM & PAY ----------------
   const handleConfirmPay = async () => {
@@ -136,6 +111,7 @@ export default function StaffPOS() {
     try {
       const token = localStorage.getItem("token");
 
+      // Set the confirmed amount paid (updates receipt)
       setAmountPaid(Number(amountPaidInput));
 
       // 1️⃣ Create Order
@@ -147,9 +123,11 @@ export default function StaffPOS() {
           unit_price: i.unit_price,
         })),
       };
+
       const orderRes = await axios.post(`${API_BASE}/orders`, orderPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const orderId = orderRes.data.orderid;
 
       // 2️⃣ Insert Payment
@@ -157,7 +135,7 @@ export default function StaffPOS() {
         orderid: orderId,
         reference_code: referenceCode,
         partialamountpaid: total,
-        method: paymentMethod, // <- already handled
+        method: paymentMethod,
       };
 
       await axios.post(`${API_BASE}/customerpayment`, paymentPayload, {
@@ -170,8 +148,7 @@ export default function StaffPOS() {
         )}`
       );
 
-      // Print receipt after payment
-
+      // NOTE: Do NOT clear cart here, so receipt remains
       setAmountPaidInput("");
     } catch (err) {
       console.error(err);
@@ -179,7 +156,14 @@ export default function StaffPOS() {
     }
   };
 
-  // ---------------- RENDER ----------------
+  // ---------------- Ensure printing works after amountPaid updates ----------------
+  useEffect(() => {
+    if (amountPaid > 0 && receiptRef.current) {
+      // Only print when user clicks print button
+      // This effect can be removed if you don't want auto-print
+    }
+  }, [amountPaid]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
       {/* HEADER */}
@@ -233,6 +217,7 @@ export default function StaffPOS() {
               </div>
             </div>
 
+            {/* Grid 2 columns */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[...services, ...products]
                 .filter((item) => {
@@ -296,6 +281,7 @@ export default function StaffPOS() {
               ref={receiptRef}
               className="p-4 bg-white text-gray-900 rounded-2xl print:w-[300px] print:p-2 print:shadow-none"
             >
+              {/* HEADER */}
               <div className="text-center mb-4">
                 <img
                   src="/src/assets/honeydolls.jpg"
@@ -312,6 +298,7 @@ export default function StaffPOS() {
 
               <hr className="border-gray-300 my-2" />
 
+              {/* CART ITEMS */}
               <div className="space-y-2 mb-2">
                 {cart.length === 0 ? (
                   <p className="text-center text-gray-500 text-sm py-4">
@@ -335,6 +322,7 @@ export default function StaffPOS() {
 
               <hr className="border-gray-300 my-2" />
 
+              {/* TOTALS */}
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -352,6 +340,7 @@ export default function StaffPOS() {
 
               <hr className="border-gray-300 my-2" />
 
+              {/* AMOUNT PAID & CHANGE */}
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
                   <span>Amount Paid</span>
@@ -365,6 +354,7 @@ export default function StaffPOS() {
 
               <hr className="border-gray-300 my-2" />
 
+              {/* PAYMENT METHOD */}
               <div className="text-sm">
                 <p>
                   Payment Method:{" "}
@@ -374,10 +364,29 @@ export default function StaffPOS() {
 
               <hr className="border-gray-300 my-2" />
 
+              {/* FOOTER */}
               <div className="text-center text-xs text-gray-500 mt-2">
                 Thank you for visiting Honey Dolls & Brilliant!
               </div>
             </div>
+
+            {/* PRINT STYLES */}
+            <style>
+              {`
+                @media print {
+                  body {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                  }
+                  button, header, input, .no-print {
+                    display: none !important;
+                  }
+                  .print\\:w-\\[300px\\] {
+                    width: 300px !important;
+                  }
+                }
+              `}
+            </style>
 
             {/* AMOUNT PAID INPUT */}
             <div className="mt-4">
@@ -392,30 +401,6 @@ export default function StaffPOS() {
                 className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-orange-400"
               />
             </div>
-            {/* PAYMENT METHOD SELECTOR */}
-            <div className="mt-4">
-              <span className="block text-sm font-medium text-gray-700 mb-1">
-                Payment Method
-              </span>
-              <div className="flex gap-4">
-                {["Cash", "Gcash", "Credit Card"].map((method) => (
-                  <label
-                    key={method}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={paymentMethod === method}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    {method}
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* BUTTONS */}
             <div className="space-y-3 mt-4">
@@ -428,7 +413,8 @@ export default function StaffPOS() {
               </button>
 
               <button
-                onClick={printReceipt}
+                onClick={handlePrint}
+                disabled={cart.length === 0}
                 className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition font-medium text-sm"
               >
                 <Printer className="w-4 h-4" /> Print Receipt
