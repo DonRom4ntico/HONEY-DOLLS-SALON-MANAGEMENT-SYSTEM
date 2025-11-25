@@ -1,7 +1,7 @@
 // src/components/Custapp.jsx
 import React, { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
-import logo from "../assets/logos.png";
+import logo from "../../assets/logos.png";
 import DatePicker from "react-datepicker";
 import { Calendar } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";

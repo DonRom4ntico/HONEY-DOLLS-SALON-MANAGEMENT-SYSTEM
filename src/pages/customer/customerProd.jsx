@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { X, Minus, Plus, SlidersHorizontal } from "lucide-react";
 import axios from "axios";
 

@@ -1,6 +1,6 @@
 // src/pages/AdminStaffSchedule.jsx
 import { Bell, Search, Calendar, Clock, User, Scissors, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../layout/adminLayout';
 import { useState } from 'react';
 
 export default function AdminStaffSchedule() {

@@ -1,7 +1,7 @@
   // src/pages/supplierReturn.jsx
   import { useState } from 'react';
   import { Search, ChevronDown, Eye, Package, Plus, X } from 'lucide-react';
-  import AdminLayout from '../layout/adminLayout';
+  import AdminLayout from '../../../layout/adminLayout';
 
   export default function SupplierReturn() {
     const [searchTerm, setSearchTerm] = useState('');

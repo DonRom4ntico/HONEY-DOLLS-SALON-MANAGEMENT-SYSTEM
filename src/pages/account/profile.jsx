@@ -1,6 +1,6 @@
 // src/pages/Profile.jsx
 import React, { useState } from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { User, Mail, Phone, Calendar, MapPin, Camera, Edit2, Save, X } from "lucide-react";
 
 export default function Profile() {

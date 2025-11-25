@@ -1,7 +1,7 @@
 // src/pages/supplierPurchases.jsx
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../../layout/adminLayout';
 
 export default function SupplierPurchases() {
   const [items, setItems] = useState([

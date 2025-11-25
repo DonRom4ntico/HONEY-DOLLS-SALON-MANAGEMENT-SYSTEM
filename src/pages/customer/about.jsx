@@ -1,6 +1,6 @@
 // src/pages/About.jsx
 import React from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { Scissors, User, Clock } from "lucide-react"; // ← THIS WAS MISSING!
 
 export default function About() {

@@ -1,7 +1,7 @@
 // src/pages/customerReturnedProducts.jsx
 import { useState } from 'react';
 import { Search, ChevronDown, Eye, Package } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../../layout/adminLayout';
 
 export default function CustomerReturnedProducts() {
   const [searchTerm, setSearchTerm] = useState('');

@@ -1,6 +1,6 @@
 import { Bell, Upload, X } from 'lucide-react';
 import { useState } from 'react';
-import CustomerLayout from '../layout/customerLayout';
+import CustomerLayout from '../../layout/customerLayout';
 
 export default function CustomerReturnForm() {
   const [images, setImages] = useState([]);

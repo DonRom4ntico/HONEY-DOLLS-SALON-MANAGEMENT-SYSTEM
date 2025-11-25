@@ -1,7 +1,7 @@
 // src/pages/Dashboard.jsx
 import React from "react";
 import { Link } from "react-router-dom"; // ← Added only this line
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 
 const Dashboard = () => {
   const scrollToServices = () => {

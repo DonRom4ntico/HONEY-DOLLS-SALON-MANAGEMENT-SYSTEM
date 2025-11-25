@@ -1,7 +1,7 @@
 // src/pages/inventory.jsx
 import { useState } from 'react';
 import { Search, ChevronDown, Package } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../../layout/adminLayout';
 
 export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState('');

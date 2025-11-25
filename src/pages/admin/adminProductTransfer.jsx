@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Search, Plus, Trash2, X } from 'lucide-react';
 import Select from 'react-select';
-import AdminLayout from '../layout/adminLayout'; // Fixed typo: was adminLayout
+import AdminLayout from '../../layout/adminLayout'; // Fixed typo: was adminLayout
 
 export default function AdminProductTransfer() {
   const [fromBranch, setFromBranch] = useState('Gaisano Mall (Branch 1)');

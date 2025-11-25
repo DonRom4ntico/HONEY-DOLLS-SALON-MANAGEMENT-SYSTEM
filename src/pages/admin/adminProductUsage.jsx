@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Search, Plus, Trash2, X } from 'lucide-react';
 import Select from 'react-select';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../layout/adminLayout';
 
 export default function AdminProductUsage() {
   const [searchTerm, setSearchTerm] = useState('');

@@ -1,6 +1,6 @@
 // src/pages/CustomerTransaction.jsx
 import React, { useState } from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { Search, Trash2, Minus, Plus } from "lucide-react";
 
 export default function CustomerTransaction() {

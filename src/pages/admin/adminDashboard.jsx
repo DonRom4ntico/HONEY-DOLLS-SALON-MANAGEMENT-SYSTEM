@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../layout/adminLayout';
 
 export default function AdminDashboard() {
   // ── Sample data (replace with API later) ───────────────────────────────

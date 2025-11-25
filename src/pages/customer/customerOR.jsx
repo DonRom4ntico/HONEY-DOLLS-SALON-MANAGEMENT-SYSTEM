@@ -1,6 +1,6 @@
 // src/pages/CustomerOR.jsx
 import { Bell, Printer } from 'lucide-react';
-import CustomerLayout from '../layout/customerLayout';
+import CustomerLayout from '../../layout/customerLayout';
 
 export default function CustomerOR() {
   const receipt = {

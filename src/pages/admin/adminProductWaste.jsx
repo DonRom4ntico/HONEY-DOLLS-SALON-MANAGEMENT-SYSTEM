@@ -1,7 +1,7 @@
 // src/pages/adminProductWaste.jsx
 import { useState } from 'react';
 import { Search, Printer, Plus, X } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../layout/adminLayout';
 import Select from 'react-select';
 
 export default function AdminProductWaste() {

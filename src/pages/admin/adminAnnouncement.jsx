@@ -1,6 +1,6 @@
 // src/pages/AdminAnnouncements.jsx
 import { Search, Calendar, Clock, ChevronDown } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../layout/adminLayout';
 import { useState } from 'react';
 
 export default function AdminAnnouncements() {

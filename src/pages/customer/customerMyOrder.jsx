@@ -1,6 +1,6 @@
 // src/pages/CustomerMyOrder.jsx
 import React, { useState } from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { X, Star, Minus, Plus } from "lucide-react";
 
 const CustomerMyOrder = () => {

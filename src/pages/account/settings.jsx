@@ -1,6 +1,6 @@
 // src/pages/Settings.jsx
 import React from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import {
   Mail,
   Lock,

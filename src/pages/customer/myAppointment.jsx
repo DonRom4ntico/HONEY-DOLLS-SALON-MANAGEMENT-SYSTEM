@@ -1,6 +1,6 @@
 // src/pages/MyAppointment.jsx
 import React, { useState } from "react";
-import CustomerLayout from "../layout/customerLayout";
+import CustomerLayout from "../../layout/customerLayout";
 import { Calendar, Clock, User, CheckCircle, AlertCircle, Search } from "lucide-react";
 
 export default function MyAppointment() {

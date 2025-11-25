@@ -1,6 +1,6 @@
 import { Bell, X, Star, Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
-import CustomerLayout from '../layout/customerLayout';
+import CustomerLayout from '../../layout/customerLayout';
 
 export default function App() {
   const [quantity, setQuantity] = useState(1);

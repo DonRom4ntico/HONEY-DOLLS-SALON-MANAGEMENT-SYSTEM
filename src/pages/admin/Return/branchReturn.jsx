@@ -1,7 +1,7 @@
 // src/pages/branchReturn.jsx
 import { useState } from 'react';
 import { Search, ChevronDown, Eye, Package, Plus, X, Building2 } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../../layout/adminLayout';
 
 export default function BranchReturn() {
   const [searchTerm, setSearchTerm] = useState('');

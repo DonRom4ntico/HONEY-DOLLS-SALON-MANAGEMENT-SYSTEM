@@ -1,7 +1,7 @@
 // src/pages/PaymentsDashboard.jsx
 import { useState } from 'react';
 import { Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
+import AdminLayout from '../../../layout/adminLayout';
 
 export default function PaymentsDashboard() {
   const [searchQuery, setSearchQuery] = useState('');

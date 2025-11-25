@@ -1,4 +1,4 @@
-import AdminLayout from "../layout/adminLayout";
+import AdminLayout from "../../layout/adminLayout";
 import { Search, Printer, Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
