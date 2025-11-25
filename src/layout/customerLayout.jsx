@@ -8,7 +8,7 @@ import {
   Settings, 
   LogOut, 
   ChevronDown,
-  Calendar, // ← Added only this
+  Calendar, 
   Menu,
   X
 } from "lucide-react";
@@ -16,64 +16,65 @@ import {
 export default function CustomerLayout({ children }) {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const userName = "Jana Mae";
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const isActive = (path) => location.pathname === path;
+
+  const navLinks = [
+    { name: "Home", path: "/dashboard" },
+    { name: "About Us", path: "/about" },
+    { name: "Products", path: "/customerProd" },
+  ];
 
   return (
     <div className="min-h-screen text-gray-900 font-sans">
 
-      {/* RESPONSIVE NAVBAR ONLY */}
-      <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm z-50">
-        <div className="px-6 md:px-12 lg:px-16 py-5 flex items-center justify-between">
+      {/* NAVBAR */}
+      <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm sticky top-0 z-50">
+        <div className="px-6 py-4 flex items-center justify-between">
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img
-              src="/src/assets/logos.png"
-              alt="Honey Dolls Logo"
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-            <h1 className="text-lg md:text-xl font-bold text-orange-900 leading-tight">
-              Honey Dolls & Brilliant Beauty Hub — Davao
-            </h1>
-          </Link>
+          {/* LEFT: LOGO + TITLE */}
+          <div className="flex items-center gap-4">
+            {/* MOBILE BURGER */}
+            <button
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              className="lg:hidden text-orange-900"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-7 h-7" />
+              ) : (
+                <Menu className="w-7 h-7" />
+              )}
+            </button>
 
-          {/* NAVIGATION WITH ACTIVE HIGHLIGHT */}
+            {/* LOGO + BRAND */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
+                <span className="text-orange-600 font-bold text-xl">HD</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-orange-900">Honey Dolls & Brilliant</h1>
+                <p className="text-sm text-orange-800 font-medium">Beauty Hub — Davao</p>
+              </div>
+            </div>
+          </div>
+
+          {/* DESKTOP NAV */}
           <nav className="flex items-center gap-10 text-base font-semibold text-orange-900">
-            <Link
-              to="/dashboard"
-              className={`relative transition-all ${isActive("/dashboard") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
-            >
-              Home
-              {isActive("/dashboard") && (
-                <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-              )}
-            </Link>
-
-
-            <Link
-              to="/about"
-              className={`relative transition-all ${isActive("/about") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
-            >
-              About Us
-              {isActive("/about") && (
-                <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-              )}
-            </Link>
-
-            <Link
-              to="/customerProd"
-              className={`relative transition-all ${isActive("/customerProd") ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
-            >
-              Products
-              {isActive("/customerProd") && (
-                <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-              )}
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`relative transition-all ${isActive(link.path) ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
+              >
+                {link.name}
+                {isActive(link.path) && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
+                )}
+              </Link>
+            ))}
           </nav>
 
           {/* PROFILE + DROPDOWN */}
@@ -87,9 +88,7 @@ export default function CustomerLayout({ children }) {
                   src="/src/assets/nigga.jpg"
                   alt="Profile"
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/80/ffcdd2/000000?text=U";
-                  }}
+                  onError={(e) => { e.target.src = "https://via.placeholder.com/80/ffcdd2/000000?text=U"; }}
                 />
               </div>
               <ChevronDown 
@@ -97,34 +96,24 @@ export default function CustomerLayout({ children }) {
               />
             </button>
 
-            {/* DROPDOWN */}
             {dropdownOpen && (
               <>
                 <div
                   className="fixed inset-0 z-40"
                   onClick={() => setDropdownOpen(false)}
                 />
-
                 <div className="absolute right-0 mt-4 -mr-3 w-64 bg-white rounded-xl shadow-2xl border border-pink-100 z-50 overflow-hidden">
                   <div className="py-4 px-5 bg-gradient-to-r from-pink-50 to-pink-100 border-b border-pink-200">
                     <p className="text-sm text-pink-700 font-medium">Signed in as</p>
                     <p className="text-lg font-bold text-pink-900">{userName}</p>
                   </div>
-
                   <div className="py-2">
                     <Link to="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <User className="w-5 h-5" /> <span>Profile</span>
                     </Link>
-
-                    {/* NEW: My Appointments */}
-                    <Link 
-                      to="/myAppointment" 
-                      onClick={() => setDropdownOpen(false)} 
-                      className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
-                    >
+                    <Link to="/myAppointment" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <Calendar className="w-5 h-5" /> <span>My Appointments</span>
                     </Link>
-
                     <Link to="/customerTransaction" onClick={() => setDropdownOpen(false)} className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition">
                       <ShoppingCart className="w-5 h-5" /> <span>My Cart</span>
                     </Link>
@@ -151,8 +140,28 @@ export default function CustomerLayout({ children }) {
               </>
             )}
           </div>
-
         </div>
+
+        {/* MOBILE MENU */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] px-6 pb-4">
+            <nav className="flex flex-col gap-4 text-base font-semibold text-orange-900 mt-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`relative transition-all ${isActive(link.path) ? "text-yellow-700 font-bold" : "hover:text-yellow-600"}`}
+                >
+                  {link.name}
+                  {isActive(link.path) && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
+                  )}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="pt-0">
