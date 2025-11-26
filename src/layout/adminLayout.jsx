@@ -3,7 +3,9 @@ import {
   Bell, Home, Calendar, Megaphone, Box, ArrowRightLeft, Trash2, AlertTriangle, 
   Package, Users, Building, FileText, DollarSign, Archive, PlusCircle, 
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu, 
-  PlusSquare, BellPlus, User, Settings  // Added User & Settings
+  PlusSquare, BellPlus, User, Settings,  // Added User & Settings
+  Plus,
+  ShieldAlert
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -20,11 +22,13 @@ export default function AdminLayout({ children, title }) {
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/adminDashboard' },
-    { icon: Calendar, label: 'Staff Schedule', path: '/adminStaffSchedule' },
+    { icon: User, label: 'Add New Staff', path: '/addStaff' },
+    { icon: ShieldAlert, label: 'Add New Admin', path: '/addAdmin' },
     { icon: Megaphone, label: 'Announcements', path: '/adminAnnouncement' },
     { header: 'Products' },
     { icon: ArrowRightLeft, label: 'Products Transfer', path: '/adminProductTransfer' },
     { icon: Box, label: 'Products Sold', path: '/adminProductSold' },
+    { icon: FileText, label: 'Product Usage', path: '/adminProductUsage' },
     { icon: Trash2, label: 'Products Wasted', path: '/adminProductWaste' },
     { icon: AlertTriangle, label: 'Products Damaged', path: '/adminProductDamage' },
     {
@@ -33,25 +37,21 @@ export default function AdminLayout({ children, title }) {
       dropdown: true,
       items: [
         { icon: Users, label: 'Customer', path: '/customerReturnedProducts' },
-        { icon: Store, label: 'Supplier', path: '/supplier' },
-        { icon: Building, label: 'Branches', path: '/branches' },
+        { icon: Store, label: 'Supplier', path: '/supplierReturn' },
+        { icon: Building, label: 'Branches', path: '/branchReturn' },
       ],
     },
     { header: 'Action' },
-    { icon: FileText, label: 'Record Product Usage', path: '/adminProductUsage' },
-    { icon: ArrowRightLeft, label: 'Transfer Products', path: '/adminProductTransfer' },
-    { icon: Trash2, label: 'Record Product Waste', path: '/recordProductWaste' },
-    { icon: AlertTriangle, label: 'Record Product Damaged', path: '/adminProductDamage' },
     { icon: DollarSign, label: 'Supplier Purchases', path: '/supplierPurchases' },
-    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
-    { icon: BellPlus, label: 'Display Services', path: '/serviceDisplay' },
-    { icon: PlusSquare, label: 'Product Display', path: '/productDisplay'},
-    { icon: Archive, label: 'Transaction', path: '/transaction' },
+    { icon: PlusSquare, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
+    { icon: PlusCircle, label: 'Add Product Display', path: '/adminDisplayProduct' },
+    { icon: Plus, label: 'Service Display', path: '/serviceDisplay' },
+    { icon: Archive, label: 'Transaction', path: '/Transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
 
   const currentPath = location.pathname;
-  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplier', '/branches'].includes(currentPath);
+  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplierReturn', '/branches'].includes(currentPath);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -216,70 +216,6 @@ export default function AdminLayout({ children, title }) {
             </button>
           </div>
         </aside>
-
-        {/* MOBILE SIDEBAR — UNTOUCHED */}
-        {mobileMenuOpen && (
-          <>
-            <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
-            <aside className="fixed top-0 left-0 bottom-0 w-72 bg-white shadow-2xl z-50 flex flex-col lg:hidden transition-transform duration-300 translate-x-0">
-              <div className="h-20 bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] flex items-center justify-between px-6">
-                <h2 className="text-lg font-bold text-orange-900">Menu</h2>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-white">
-                  <ChevronLeft className="w-8 h-8" />
-                </button>
-              </div>
-
-              <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                {menuItems.map((item, idx) => {
-                  if (item.header) return <div key={idx} className="text-xs font-bold text-gray-500 uppercase mt-6 mb-3 px-3">{item.header}</div>;
-                  const Icon = item.icon;
-                  const isActive = currentPath === item.path;
-
-                  if (item.dropdown) {
-                    return (
-                      <div key={idx}>
-                        <button
-                          onClick={() => setMobileDropdownOpen(prev => !prev)}
-                          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition ${isReturnedProductsActive ? 'bg-orange-100 text-orange-700 font-semibold' : 'hover:bg-gray-100'}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Icon className="w-5 h-5" />
-                            <span className="font-medium">{item.label}</span>
-                          </div>
-                          {mobileDropdownOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </button>
-                        {mobileDropdownOpen && (
-                          <div className="ml-10 mt-2 space-y-1 bg-gray-50 rounded-xl p-3">
-                            {item.items.map((sub, i) => (
-                              <Link key={i} to={sub.path} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-orange-100 transition font-medium text-gray-700">
-                                <sub.icon className="w-4 h-4" />
-                                <span>{sub.label}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <Link key={idx} to={item.path} onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${isActive ? 'bg-orange-100 text-orange-700 shadow-sm' : 'hover:bg-gray-100'}`}>
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-
-              <div className="p-4 border-t">
-                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-red-600 hover:bg-red-50 transition font-semibold">
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </aside>
-          </>
-        )}
 
         {/* MAIN CONTENT */}
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
