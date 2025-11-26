@@ -22,67 +22,36 @@ const Home = () => {
         {/* CUSTOMER */}
         <div>
           <h3 style={{ color: "#e67e22", margin: "0.5rem 0" }}>Customer</h3>
-          <Link to="/dashboard" className="nav-link">
-            Dashboard
-          </Link>
-          <Link to="/custapp" className="nav-link">
-            Customer Appointment
-          </Link>
-          <Link to="/customerTransaction" className="nav-link">
-            Customer Transaction
-          </Link>
-          <Link to="/prodDetails" className="nav-link">
-            Product Details
-          </Link>
-          <Link to="/customerProd" className="nav-link">
-            Customer Product
-          </Link>
-          <Link to="/customerMyOrder" className="nav-link">
-            My Orders
-          </Link>
-          <Link to="/customerReturnForm" className="nav-link">
-            Return Form
-          </Link>
-          <Link to="/customerOR" className="nav-link">
-            Official Receipt
-          </Link>
+          <Link to="/dashboard" className="nav-link">Dashboard</Link>
+          <Link to="/custapp" className="nav-link">Customer Appointment</Link>
+          <Link to="/customerTransaction" className="nav-link">Customer Transaction</Link>
+          <Link to="/prodDetails" className="nav-link">Product Details</Link>
+          <Link to="/customerProd" className="nav-link">Customer Product</Link>
+          <Link to="/customerMyOrder" className="nav-link">My Orders</Link>
+          <Link to="/customerReturnForm" className="nav-link">Return Form</Link>
+          <Link to="/customerOR" className="nav-link">Official Receipt</Link>
         </div>
 
         {/* STAFF */}
         <div>
           <h3 style={{ color: "#27ae60", margin: "0.5rem 0" }}>Staff</h3>
-          <Link to="/staffSchedule" className="nav-link">
-            Staff Schedule
-          </Link>
-          <Link to="/staffProdUsage" className="nav-link">
-            Product Usage
-          </Link>
-          <Link to="/staffPos" className="nav-link">
-            POS
-          </Link>
+          <Link to="/staffSchedule" className="nav-link">Staff Schedule</Link>
+          <Link to="/staffProdUsage" className="nav-link">Product Usage</Link>
+          <Link to="/staffPos" className="nav-link">POS</Link>
         </div>
 
         {/* ADMIN */}
         <div>
           <h3 style={{ color: "#8e44ad", margin: "0.5rem 0" }}>Admin</h3>
-          <Link to="/adminDashboard" className="nav-link">
-            Dashboard
-          </Link>
-          <Link to="/branches" className="nav-link">
-            Branches
-          </Link>
-          <Link to="/productDisplay"> Product Display </Link>
+          <Link to="/adminDashboard" className="nav-link">Dashboard</Link>
+          <Link to="/branches" className="nav-link">Branches</Link>
         </div>
 
         {/* AUTH */}
         <div>
           <h3 style={{ color: "#34495e", margin: "0.5rem 0" }}>Auth</h3>
-          <Link to="/login" className="nav-link">
-            Login
-          </Link>
-          <Link to="/register" className="nav-link">
-            Register
-          </Link>
+          <Link to="/login" className="nav-link">Login</Link>
+          <Link to="/register" className="nav-link">Register</Link>
         </div>
       </nav>
 
@@ -96,7 +65,7 @@ const Home = () => {
           border-radius: 8px;
           margin-bottom: 0.5rem;
           font-weight: 500;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
           transition: all 0.2s;
         }
         .nav-link:hover {

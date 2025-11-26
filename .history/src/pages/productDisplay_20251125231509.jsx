@@ -328,12 +328,8 @@ export default function ProductDisplay() {
                       />
                     ) : editProduct && editProduct.prodimage ? (
                       <img
-                        src={
-                          newProduct.prodimage
-                            ? URL.createObjectURL(newProduct.prodimage)
-                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
-                        }
-                        alt="Preview"
+                        src={`${API_BASE}/uploads/${editProduct.prodimage}`}
+                        alt="Current"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
                     ) : (

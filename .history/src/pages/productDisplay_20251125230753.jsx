@@ -1,13 +1,5 @@
 // src/pages/ProductDisplay.jsx
-import {
-  Search,
-  ChevronDown,
-  Plus,
-  X,
-  Upload,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Search, ChevronDown, Plus, X, Upload } from "lucide-react";
 import AdminLayout from "../layout/adminLayout";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -19,7 +11,6 @@ export default function ProductDisplay() {
   const [sortOrder, setSortOrder] = useState("created-desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState(null);
   const itemsPerPage = 6;
 
   const categories = [
@@ -38,15 +29,16 @@ export default function ProductDisplay() {
     prodimage: null,
   });
 
+  const [editingProduct, setEditingProduct] = useState(null);
   const [products, setProducts] = useState([]);
 
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${API_BASE}/products`);
+      const { data } = await axios.get(`${API_BASE}`);
       setProducts(data.products);
     } catch (error) {
-      console.error("Failed to fetch products:", error);
+      console.error("Fetch failed:", error);
     }
   };
 
@@ -79,11 +71,18 @@ export default function ProductDisplay() {
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setNewProduct((prev) => ({ ...prev, prodimage: file }));
+    if (editingProduct) {
+      setEditingProduct((prev) => ({ ...prev, prodimage: file }));
+    } else {
+      setNewProduct((prev) => ({ ...prev, prodimage: file }));
+    }
   };
 
-  // Add or Update product
-  const handleSaveProduct = async () => {
+  // Add product
+  const handleAddProduct = async () => {
+    if (!newProduct.prodname || !newProduct.prodcat || !newProduct.price)
+      return;
+
     try {
       const formData = new FormData();
       formData.append("prodname", newProduct.prodname);
@@ -92,58 +91,73 @@ export default function ProductDisplay() {
       if (newProduct.prodimage)
         formData.append("prodimage", newProduct.prodimage);
 
-      if (editProduct) {
-        // UPDATE
-        const { data } = await axios.put(
-          `${API_BASE}/products/${editProduct.productid}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-        setProducts((prev) =>
-          prev.map((p) =>
-            p.productid === data.product.productid ? data.product : p
-          )
-        );
-      } else {
-        // CREATE
-        const { data } = await axios.post(`${API_BASE}/products`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setProducts((prev) => [...prev, data.product]);
-      }
+      const { data } = await axios.post(`${API_BASE}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
+      setProducts((prev) => [...prev, data.product]);
       setNewProduct({ prodname: "", prodcat: "", price: "", prodimage: null });
-      setEditProduct(null);
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Failed to save product:", error);
-      alert("Failed to save product. Check console for details.");
+      console.error("Failed to add product:", error);
+      alert("Failed to add product. Check console for details.");
+    }
+  };
+
+  // Update product
+  const handleUpdateProduct = async () => {
+    if (
+      !editingProduct.prodname ||
+      !editingProduct.prodcat ||
+      !editingProduct.price
+    )
+      return;
+
+    try {
+      const formData = new FormData();
+      formData.append("prodname", editingProduct.prodname);
+      formData.append("prodcat", editingProduct.prodcat);
+      formData.append("price", editingProduct.price);
+      if (editingProduct.prodimage)
+        formData.append("prodimage", editingProduct.prodimage);
+
+      const { data } = await axios.put(
+        `${API_BASE}/${editingProduct.productid}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.productid === data.product.productid ? data.product : p
+        )
+      );
+      setEditingProduct(null);
+      setIsModalOpen(false);
+      alert("Product updated successfully");
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Failed to update product. Check console for details.");
     }
   };
 
   // Delete product
-  const handleDelete = async (id) => {
+  const handleDeleteProduct = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
+
     try {
-      await axios.delete(`${API_BASE}/products/${id}`);
+      await axios.delete(`${API_BASE}/${id}`);
       setProducts((prev) => prev.filter((p) => p.productid !== id));
+      alert("Product deleted successfully");
     } catch (error) {
-      console.error("Failed to delete product:", error);
+      console.error("Delete failed:", error);
       alert("Failed to delete product. Check console for details.");
     }
   };
 
-  // Open modal for editing
-  const handleEdit = (product) => {
-    setEditProduct(product);
-    setNewProduct({
-      prodname: product.prodname,
-      prodcat: product.prodcat,
-      price: product.price,
-      prodimage: null, // optional to upload new image
-    });
+  // Edit product
+  const handleEditProduct = (product) => {
+    setEditingProduct({ ...product, prodimage: null });
     setIsModalOpen(true);
   };
 
@@ -157,22 +171,14 @@ export default function ProductDisplay() {
               Honey Dolls • Brilliant Beauty Hub
             </h1>
             <p className="text-sm text-gray-600 mt-2">
-              Product Display <br />
+              Product Display
+              <br />
               View and manage all products in inventory
             </p>
           </div>
 
           <button
-            onClick={() => {
-              setIsModalOpen(true);
-              setEditProduct(null);
-              setNewProduct({
-                prodname: "",
-                prodcat: "",
-                price: "",
-                prodimage: null,
-              });
-            }}
+            onClick={() => setIsModalOpen(true)}
             style={{
               background: "linear-gradient(to right, #ec4899, #f97316)",
               boxShadow: "0 10px 30px rgba(236, 72, 153, 0.5)",
@@ -257,16 +263,16 @@ export default function ProductDisplay() {
                   </td>
                   <td className="text-center py-4 px-6 flex justify-center gap-2">
                     <button
-                      onClick={() => handleEdit(item)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-1"
+                      onClick={() => handleEditProduct(item)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                     >
-                      <Edit className="w-4 h-4" /> Edit
+                      Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(item.productid)}
-                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-1"
+                      onClick={() => handleDeleteProduct(item.productid)}
+                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
                     >
-                      <Trash2 className="w-4 h-4" /> Delete
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -304,10 +310,13 @@ export default function ProductDisplay() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-screen overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {editProduct ? "Edit Product" : "Add New Product"}
+                  {editingProduct ? "Edit Product" : "Add New Product"}
                 </h2>
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingProduct(null);
+                  }}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   <X className="w-6 h-6" />
@@ -320,18 +329,12 @@ export default function ProductDisplay() {
                 </label>
                 <label htmlFor="image-upload" className="cursor-pointer block">
                   <div className="border-2 border-dashed border-orange-300 rounded-2xl p-8 text-center hover:border-orange-500 transition-all bg-gradient-to-br from-pink-50 to-orange-50">
-                    {newProduct.prodimage ? (
-                      <img
-                        src={URL.createObjectURL(newProduct.prodimage)}
-                        alt="Preview"
-                        className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
-                      />
-                    ) : editProduct && editProduct.prodimage ? (
+                    {editingProduct?.prodimage || newProduct.prodimage ? (
                       <img
                         src={
-                          newProduct.prodimage
-                            ? URL.createObjectURL(newProduct.prodimage)
-                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
+                          editingProduct?.prodimage
+                            ? URL.createObjectURL(editingProduct.prodimage)
+                            : URL.createObjectURL(newProduct.prodimage)
                         }
                         alt="Preview"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
@@ -365,10 +368,22 @@ export default function ProductDisplay() {
                   </label>
                   <input
                     type="text"
-                    value={newProduct.prodname}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, prodname: e.target.value })
+                    value={
+                      editingProduct
+                        ? editingProduct.prodname
+                        : newProduct.prodname
                     }
+                    onChange={(e) => {
+                      editingProduct
+                        ? setEditingProduct({
+                            ...editingProduct,
+                            prodname: e.target.value,
+                          })
+                        : setNewProduct({
+                            ...newProduct,
+                            prodname: e.target.value,
+                          });
+                    }}
                     placeholder="e.g. Argan Oil Serum"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
@@ -379,10 +394,22 @@ export default function ProductDisplay() {
                     Product Category
                   </label>
                   <select
-                    value={newProduct.prodcat}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, prodcat: e.target.value })
+                    value={
+                      editingProduct
+                        ? editingProduct.prodcat
+                        : newProduct.prodcat
                     }
+                    onChange={(e) => {
+                      editingProduct
+                        ? setEditingProduct({
+                            ...editingProduct,
+                            prodcat: e.target.value,
+                          })
+                        : setNewProduct({
+                            ...newProduct,
+                            prodcat: e.target.value,
+                          });
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   >
                     <option value="">Select category...</option>
@@ -402,10 +429,20 @@ export default function ProductDisplay() {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={newProduct.price}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, price: e.target.value })
+                    value={
+                      editingProduct ? editingProduct.price : newProduct.price
                     }
+                    onChange={(e) => {
+                      editingProduct
+                        ? setEditingProduct({
+                            ...editingProduct,
+                            price: e.target.value,
+                          })
+                        : setNewProduct({
+                            ...newProduct,
+                            price: e.target.value,
+                          });
+                    }}
                     placeholder="350.00"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
@@ -414,29 +451,34 @@ export default function ProductDisplay() {
 
               <div className="flex gap-4 mt-8">
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingProduct(null);
+                  }}
                   className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveProduct}
+                  onClick={
+                    editingProduct ? handleUpdateProduct : handleAddProduct
+                  }
                   disabled={
-                    !newProduct.prodname ||
-                    !newProduct.prodcat ||
-                    !newProduct.price
+                    !(editingProduct?.prodname || newProduct.prodname) ||
+                    !(editingProduct?.prodcat || newProduct.prodcat) ||
+                    !(editingProduct?.price || newProduct.price)
                   }
                   style={{
                     background:
-                      newProduct.prodname &&
-                      newProduct.prodcat &&
-                      newProduct.price
+                      (editingProduct?.prodname || newProduct.prodname) &&
+                      (editingProduct?.prodcat || newProduct.prodcat) &&
+                      (editingProduct?.price || newProduct.price)
                         ? "linear-gradient(to right, #ec4899, #f97316)"
                         : "#cccccc",
                   }}
                   className="flex-1 px-6 py-3 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:cursor-not-allowed"
                 >
-                  {editProduct ? "Update Product" : "Add Product"}
+                  {editingProduct ? "Update Product" : "Add Product"}
                 </button>
               </div>
             </div>

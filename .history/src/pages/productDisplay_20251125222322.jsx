@@ -1,25 +1,16 @@
 // src/pages/ProductDisplay.jsx
-import {
-  Search,
-  ChevronDown,
-  Plus,
-  X,
-  Upload,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Search, ChevronDown, Plus, X, Upload } from "lucide-react";
 import AdminLayout from "../layout/adminLayout";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE; // e.g., http://localhost:4000/api/products
 
 export default function ProductDisplay() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("created-desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState(null);
   const itemsPerPage = 6;
 
   const categories = [
@@ -35,24 +26,10 @@ export default function ProductDisplay() {
     prodname: "",
     prodcat: "",
     price: "",
-    prodimage: null,
+    prodimage: null, // will hold File object
   });
 
   const [products, setProducts] = useState([]);
-
-  // Fetch products
-  const fetchProducts = async () => {
-    try {
-      const { data } = await axios.get(`${API_BASE}/products`);
-      setProducts(data.products);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   // Filter & Sort
   const filtered = products
@@ -82,8 +59,11 @@ export default function ProductDisplay() {
     setNewProduct((prev) => ({ ...prev, prodimage: file }));
   };
 
-  // Add or Update product
-  const handleSaveProduct = async () => {
+  // Add product
+  const handleAddProduct = async () => {
+    if (!newProduct.prodname || !newProduct.prodcat || !newProduct.price)
+      return;
+
     try {
       const formData = new FormData();
       formData.append("prodname", newProduct.prodname);
@@ -92,59 +72,17 @@ export default function ProductDisplay() {
       if (newProduct.prodimage)
         formData.append("prodimage", newProduct.prodimage);
 
-      if (editProduct) {
-        // UPDATE
-        const { data } = await axios.put(
-          `${API_BASE}/products/${editProduct.productid}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-        setProducts((prev) =>
-          prev.map((p) =>
-            p.productid === data.product.productid ? data.product : p
-          )
-        );
-      } else {
-        // CREATE
-        const { data } = await axios.post(`${API_BASE}/products`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setProducts((prev) => [...prev, data.product]);
-      }
+      const { data } = await axios.post(`${API_BASE}/create`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
+      setProducts((prev) => [...prev, data.product]);
       setNewProduct({ prodname: "", prodcat: "", price: "", prodimage: null });
-      setEditProduct(null);
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Failed to save product:", error);
-      alert("Failed to save product. Check console for details.");
+      console.error("Failed to add product:", error);
+      alert("Failed to add product. Check console for details.");
     }
-  };
-
-  // Delete product
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-    try {
-      await axios.delete(`${API_BASE}/products/${id}`);
-      setProducts((prev) => prev.filter((p) => p.productid !== id));
-    } catch (error) {
-      console.error("Failed to delete product:", error);
-      alert("Failed to delete product. Check console for details.");
-    }
-  };
-
-  // Open modal for editing
-  const handleEdit = (product) => {
-    setEditProduct(product);
-    setNewProduct({
-      prodname: product.prodname,
-      prodcat: product.prodcat,
-      price: product.price,
-      prodimage: null, // optional to upload new image
-    });
-    setIsModalOpen(true);
   };
 
   return (
@@ -157,22 +95,14 @@ export default function ProductDisplay() {
               Honey Dolls • Brilliant Beauty Hub
             </h1>
             <p className="text-sm text-gray-600 mt-2">
-              Product Display <br />
+              Product Display
+              <br />
               View and manage all products in inventory
             </p>
           </div>
 
           <button
-            onClick={() => {
-              setIsModalOpen(true);
-              setEditProduct(null);
-              setNewProduct({
-                prodname: "",
-                prodcat: "",
-                price: "",
-                prodimage: null,
-              });
-            }}
+            onClick={() => setIsModalOpen(true)}
             style={{
               background: "linear-gradient(to right, #ec4899, #f97316)",
               boxShadow: "0 10px 30px rgba(236, 72, 153, 0.5)",
@@ -227,7 +157,6 @@ export default function ProductDisplay() {
                 <th className="text-center py-4 px-6 font-semibold">
                   Created At
                 </th>
-                <th className="text-center py-4 px-6 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -238,7 +167,7 @@ export default function ProductDisplay() {
                   </td>
                   <td className="py-4 px-6 font-medium">{item.prodname}</td>
                   <td className="text-center py-4 px-6 text-orange-700 font-semibold">
-                    ₱{parseFloat(item.price).toFixed(2)}
+                    ₱{item.price.toFixed(2)}
                   </td>
                   <td className="text-center py-4 px-6">{item.prodcat}</td>
                   <td className="text-center py-4 px-6">
@@ -254,20 +183,6 @@ export default function ProductDisplay() {
                     {item.createdat
                       ? new Date(item.createdat).toLocaleDateString()
                       : "-"}
-                  </td>
-                  <td className="text-center py-4 px-6 flex justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-1"
-                    >
-                      <Edit className="w-4 h-4" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.productid)}
-                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-1"
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -304,7 +219,7 @@ export default function ProductDisplay() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-screen overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {editProduct ? "Edit Product" : "Add New Product"}
+                  Add New Product
                 </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -323,16 +238,6 @@ export default function ProductDisplay() {
                     {newProduct.prodimage ? (
                       <img
                         src={URL.createObjectURL(newProduct.prodimage)}
-                        alt="Preview"
-                        className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
-                      />
-                    ) : editProduct && editProduct.prodimage ? (
-                      <img
-                        src={
-                          newProduct.prodimage
-                            ? URL.createObjectURL(newProduct.prodimage)
-                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
-                        }
                         alt="Preview"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
@@ -420,7 +325,7 @@ export default function ProductDisplay() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveProduct}
+                  onClick={handleAddProduct}
                   disabled={
                     !newProduct.prodname ||
                     !newProduct.prodcat ||
@@ -436,7 +341,7 @@ export default function ProductDisplay() {
                   }}
                   className="flex-1 px-6 py-3 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:cursor-not-allowed"
                 >
-                  {editProduct ? "Update Product" : "Add Product"}
+                  Add Product
                 </button>
               </div>
             </div>

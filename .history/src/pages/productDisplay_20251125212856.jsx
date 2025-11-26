@@ -1,13 +1,5 @@
 // src/pages/ProductDisplay.jsx
-import {
-  Search,
-  ChevronDown,
-  Plus,
-  X,
-  Upload,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Search, ChevronDown, Plus, X, Upload } from "lucide-react";
 import AdminLayout from "../layout/adminLayout";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -19,7 +11,13 @@ export default function ProductDisplay() {
   const [sortOrder, setSortOrder] = useState("created-desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editProduct, setEditProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    category: "",
+    unitCost: "",
+    image: null,
+  });
   const itemsPerPage = 6;
 
   const categories = [
@@ -31,43 +29,61 @@ export default function ProductDisplay() {
     "Fragrance",
   ];
 
-  const [newProduct, setNewProduct] = useState({
-    prodname: "",
-    prodcat: "",
-    price: "",
-    prodimage: null,
-  });
-
-  const [products, setProducts] = useState([]);
-
-  // Fetch products
-  const fetchProducts = async () => {
-    try {
-      const { data } = await axios.get(`${API_BASE}/products`);
-      setProducts(data.products);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };
-
+  // Fetch products from backend
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/products`);
+      const mapped = res.data.products.map((p) => ({
+        ...p,
+        id: `PRD-${p.productid || p.id || ""}`,
+        unitCost: parseFloat(p.price || 0),
+        name: p.prodname || p.name,
+        category: p.prodcat || p.category,
+        createdAt:
+          p.createdat ||
+          new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        updatedAt:
+          p.updatedat ||
+          new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        image: p.prodimage
+          ? `${API_BASE.replace("/api", "")}/uploads/${p.prodimage}`
+          : null,
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+    }
+  };
+
   // Filter & Sort
-  const filtered = products
-    .filter(
-      (item) =>
-        item.prodname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.prodcat.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortOrder === "created-desc")
-        return new Date(b.createdat) - new Date(a.createdat);
-      if (sortOrder === "created-asc")
-        return new Date(a.createdat) - new Date(b.createdat);
-      return 0;
-    });
+  let filtered = products.filter(
+    (item) =>
+      item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  filtered.sort((a, b) => {
+    if (sortOrder === "created-desc")
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortOrder === "created-asc")
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    if (sortOrder === "updated-desc")
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    return new Date(a.updatedAt) - new Date(b.updatedAt);
+  });
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice(
@@ -75,76 +91,44 @@ export default function ProductDisplay() {
     currentPage * itemsPerPage
   );
 
-  // Image upload
+  // Handle Image Upload
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setNewProduct((prev) => ({ ...prev, prodimage: file }));
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewProduct((prev) => ({ ...prev, image: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
-  // Add or Update product
-  const handleSaveProduct = async () => {
+  // Add Product
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.category || !newProduct.unitCost)
+      return;
+
     try {
       const formData = new FormData();
-      formData.append("prodname", newProduct.prodname);
-      formData.append("prodcat", newProduct.prodcat);
-      formData.append("price", newProduct.price);
-      if (newProduct.prodimage)
-        formData.append("prodimage", newProduct.prodimage);
-
-      if (editProduct) {
-        // UPDATE
-        const { data } = await axios.put(
-          `${API_BASE}/products/${editProduct.productid}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-        setProducts((prev) =>
-          prev.map((p) =>
-            p.productid === data.product.productid ? data.product : p
-          )
-        );
-      } else {
-        // CREATE
-        const { data } = await axios.post(`${API_BASE}/products`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setProducts((prev) => [...prev, data.product]);
+      formData.append("prodname", newProduct.name);
+      formData.append("prodcat", newProduct.category);
+      formData.append("price", newProduct.unitCost);
+      if (newProduct.image) {
+        const res = await fetch(newProduct.image);
+        const blob = await res.blob();
+        formData.append("prodimage", blob, "product.png");
       }
 
-      setNewProduct({ prodname: "", prodcat: "", price: "", prodimage: null });
-      setEditProduct(null);
+      await axios.post(`${API_BASE}/products`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setNewProduct({ name: "", category: "", unitCost: "", image: null });
       setIsModalOpen(false);
-    } catch (error) {
-      console.error("Failed to save product:", error);
-      alert("Failed to save product. Check console for details.");
+      fetchProducts(); // refresh table
+    } catch (err) {
+      console.error("Failed to add product:", err);
     }
-  };
-
-  // Delete product
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-    try {
-      await axios.delete(`${API_BASE}/products/${id}`);
-      setProducts((prev) => prev.filter((p) => p.productid !== id));
-    } catch (error) {
-      console.error("Failed to delete product:", error);
-      alert("Failed to delete product. Check console for details.");
-    }
-  };
-
-  // Open modal for editing
-  const handleEdit = (product) => {
-    setEditProduct(product);
-    setNewProduct({
-      prodname: product.prodname,
-      prodcat: product.prodcat,
-      price: product.price,
-      prodimage: null, // optional to upload new image
-    });
-    setIsModalOpen(true);
   };
 
   return (
@@ -157,22 +141,13 @@ export default function ProductDisplay() {
               Honey Dolls • Brilliant Beauty Hub
             </h1>
             <p className="text-sm text-gray-600 mt-2">
-              Product Display <br />
+              Product Display
+              <br />
               View and manage all products in inventory
             </p>
           </div>
-
           <button
-            onClick={() => {
-              setIsModalOpen(true);
-              setEditProduct(null);
-              setNewProduct({
-                prodname: "",
-                prodcat: "",
-                price: "",
-                prodimage: null,
-              });
-            }}
+            onClick={() => setIsModalOpen(true)}
             style={{
               background: "linear-gradient(to right, #ec4899, #f97316)",
               boxShadow: "0 10px 30px rgba(236, 72, 153, 0.5)",
@@ -190,13 +165,12 @@ export default function ProductDisplay() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by name or category..."
+              placeholder="Search by ID, name, or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
             />
           </div>
-
           <div className="relative min-w-[200px]">
             <select
               value={sortOrder}
@@ -205,6 +179,8 @@ export default function ProductDisplay() {
             >
               <option value="created-desc">Created: Newest</option>
               <option value="created-asc">Created: Oldest</option>
+              <option value="updated-desc">Updated: Recent</option>
+              <option value="updated-asc">Updated: Oldest</option>
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>
@@ -215,59 +191,57 @@ export default function ProductDisplay() {
           <table className="w-full min-w-[900px] text-sm">
             <thead>
               <tr className="bg-gradient-to-r from-orange-50 to-pink-50">
-                <th className="text-left py-4 px-6 font-semibold">ID</th>
+                <th className="text-left py-4 px-6 font-semibold">
+                  Product ID
+                </th>
                 <th className="text-left py-4 px-6 font-semibold">
                   Product Name
                 </th>
-                <th className="text-center py-4 px-6 font-semibold">Price</th>
+                <th className="text-center py-4 px-6 font-semibold">
+                  Unit Cost
+                </th>
                 <th className="text-center py-4 px-6 font-semibold">
                   Category
                 </th>
-                <th className="text-center py-4 px-6 font-semibold">Image</th>
                 <th className="text-center py-4 px-6 font-semibold">
                   Created At
                 </th>
-                <th className="text-center py-4 px-6 font-semibold">Actions</th>
+                <th className="text-center py-4 px-6 font-semibold">
+                  Updated At
+                </th>
+                <th className="text-center py-4 px-6 font-semibold">Action</th>
               </tr>
             </thead>
             <tbody>
               {paginated.map((item) => (
-                <tr key={item.productid} className="border-t hover:bg-gray-50">
+                <tr key={item.id} className="border-t hover:bg-gray-50">
                   <td className="py-4 px-6 font-mono text-orange-700 font-medium">
-                    {item.productid}
+                    {item.id}
                   </td>
-                  <td className="py-4 px-6 font-medium">{item.prodname}</td>
+                  <td className="py-4 px-6 font-medium">{item.name}</td>
                   <td className="text-center py-4 px-6 text-orange-700 font-semibold">
-                    ₱{parseFloat(item.price).toFixed(2)}
-                  </td>
-                  <td className="text-center py-4 px-6">{item.prodcat}</td>
-                  <td className="text-center py-4 px-6">
-                    {item.prodimage && (
-                      <img
-                        src={`${API_BASE}/uploads/${item.prodimage}`}
-                        alt={item.prodname}
-                        className="mx-auto max-h-12 rounded-xl object-cover"
-                      />
-                    )}
+                    ₱{item.unitCost.toFixed(2)}
                   </td>
                   <td className="text-center py-4 px-6">
-                    {item.createdat
-                      ? new Date(item.createdat).toLocaleDateString()
-                      : "-"}
+                    <span className="inline-block px-4 py-2 text-xs font-medium text-gray-700 bg-gray-100 rounded-full border border-gray-300">
+                      {item.category}
+                    </span>
                   </td>
-                  <td className="text-center py-4 px-6 flex justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-1"
-                    >
-                      <Edit className="w-4 h-4" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.productid)}
-                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-1"
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </button>
+                  <td className="text-center py-4 px-6 text-gray-600">
+                    {item.createdAt}
+                  </td>
+                  <td className="text-center py-4 px-6 text-gray-600">
+                    {item.updatedAt}
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex justify-center gap-3">
+                      <button className="px-6 py-2 rounded-lg text-white font-semibold text-xs bg-gradient-to-r from-[#FFD873] to-[#FF9B52] shadow-sm hover:brightness-110 transition-all">
+                        Edit
+                      </button>
+                      <button className="px-6 py-2 rounded-lg text-white font-semibold text-xs bg-gradient-to-r from-[#FF8A80] to-[#FF5252] shadow-sm hover:brightness-110 transition-all">
+                        Remove
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -302,9 +276,10 @@ export default function ProductDisplay() {
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-screen overflow-y-auto">
+              {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {editProduct ? "Edit Product" : "Add New Product"}
+                  Add New Product
                 </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -314,25 +289,16 @@ export default function ProductDisplay() {
                 </button>
               </div>
 
+              {/* Image Upload */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Product Image
                 </label>
                 <label htmlFor="image-upload" className="cursor-pointer block">
                   <div className="border-2 border-dashed border-orange-300 rounded-2xl p-8 text-center hover:border-orange-500 transition-all bg-gradient-to-br from-pink-50 to-orange-50">
-                    {newProduct.prodimage ? (
+                    {newProduct.image ? (
                       <img
-                        src={URL.createObjectURL(newProduct.prodimage)}
-                        alt="Preview"
-                        className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
-                      />
-                    ) : editProduct && editProduct.prodimage ? (
-                      <img
-                        src={
-                          newProduct.prodimage
-                            ? URL.createObjectURL(newProduct.prodimage)
-                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
-                        }
+                        src={newProduct.image}
                         alt="Preview"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
@@ -356,8 +322,19 @@ export default function ProductDisplay() {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
+                {newProduct.image && (
+                  <button
+                    onClick={() =>
+                      setNewProduct((prev) => ({ ...prev, image: null }))
+                    }
+                    className="mt-3 text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove Image
+                  </button>
+                )}
               </div>
 
+              {/* Form Fields */}
               <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -365,11 +342,11 @@ export default function ProductDisplay() {
                   </label>
                   <input
                     type="text"
-                    value={newProduct.prodname}
+                    value={newProduct.name}
                     onChange={(e) =>
-                      setNewProduct({ ...newProduct, prodname: e.target.value })
+                      setNewProduct({ ...newProduct, name: e.target.value })
                     }
-                    placeholder="e.g. Argan Oil Serum"
+                    placeholder="e.g. Rose Quartz Moisturizer"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                 </div>
@@ -379,9 +356,9 @@ export default function ProductDisplay() {
                     Product Category
                   </label>
                   <select
-                    value={newProduct.prodcat}
+                    value={newProduct.category}
                     onChange={(e) =>
-                      setNewProduct({ ...newProduct, prodcat: e.target.value })
+                      setNewProduct({ ...newProduct, category: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   >
@@ -396,22 +373,23 @@ export default function ProductDisplay() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price (₱)
+                    Unit Cost (₱)
                   </label>
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
-                    value={newProduct.price}
+                    step="1"
+                    value={newProduct.unitCost}
                     onChange={(e) =>
-                      setNewProduct({ ...newProduct, price: e.target.value })
+                      setNewProduct({ ...newProduct, unitCost: e.target.value })
                     }
-                    placeholder="350.00"
+                    placeholder="299.00"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                 </div>
               </div>
 
+              {/* Buttons */}
               <div className="flex gap-4 mt-8">
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -420,23 +398,23 @@ export default function ProductDisplay() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveProduct}
+                  onClick={handleAddProduct}
                   disabled={
-                    !newProduct.prodname ||
-                    !newProduct.prodcat ||
-                    !newProduct.price
+                    !newProduct.name ||
+                    !newProduct.category ||
+                    !newProduct.unitCost
                   }
                   style={{
                     background:
-                      newProduct.prodname &&
-                      newProduct.prodcat &&
-                      newProduct.price
+                      newProduct.name &&
+                      newProduct.category &&
+                      newProduct.unitCost
                         ? "linear-gradient(to right, #ec4899, #f97316)"
                         : "#cccccc",
                   }}
                   className="flex-1 px-6 py-3 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:cursor-not-allowed"
                 >
-                  {editProduct ? "Update Product" : "Add Product"}
+                  Add Product
                 </button>
               </div>
             </div>

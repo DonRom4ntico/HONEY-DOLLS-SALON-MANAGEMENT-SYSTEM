@@ -158,9 +158,7 @@ const CustomerProd = () => {
             </button>
 
             <img
-              src={`${API_BASE.replace(/\/$/, "")}/uploads/${
-                selectedProduct.prodimage
-              }`}
+              src={`http://localhost:3000/uploads/${item.prodimage}`}
               alt={selectedProduct.prodname}
               className="w-full h-52 object-contain mb-4 rounded-lg"
             />

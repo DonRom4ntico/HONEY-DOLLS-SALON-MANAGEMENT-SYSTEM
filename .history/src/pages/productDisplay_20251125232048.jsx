@@ -244,7 +244,7 @@ export default function ProductDisplay() {
                   <td className="text-center py-4 px-6">
                     {item.prodimage && (
                       <img
-                        src={`${API_BASE}/uploads/${item.prodimage}`}
+                        src={`http://localhost:3000/uploads/${item.prodimage}`}
                         alt={item.prodname}
                         className="mx-auto max-h-12 rounded-xl object-cover"
                       />

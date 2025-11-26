@@ -238,7 +238,7 @@ export default function ProductDisplay() {
                   </td>
                   <td className="py-4 px-6 font-medium">{item.prodname}</td>
                   <td className="text-center py-4 px-6 text-orange-700 font-semibold">
-                    ₱{parseFloat(item.price).toFixed(2)}
+                    ₱{item.price.toFixed(2)}
                   </td>
                   <td className="text-center py-4 px-6">{item.prodcat}</td>
                   <td className="text-center py-4 px-6">
@@ -328,12 +328,8 @@ export default function ProductDisplay() {
                       />
                     ) : editProduct && editProduct.prodimage ? (
                       <img
-                        src={
-                          newProduct.prodimage
-                            ? URL.createObjectURL(newProduct.prodimage)
-                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
-                        }
-                        alt="Preview"
+                        src={`${API_BASE}/uploads/${editProduct.prodimage}`}
+                        alt="Current"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
                     ) : (

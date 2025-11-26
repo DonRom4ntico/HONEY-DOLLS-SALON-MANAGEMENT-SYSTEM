@@ -158,11 +158,8 @@ const CustomerProd = () => {
             </button>
 
             <img
-              src={`${API_BASE.replace(/\/$/, "")}/uploads/${
-                selectedProduct.prodimage
-              }`}
-              alt={selectedProduct.prodname}
-              className="w-full h-52 object-contain mb-4 rounded-lg"
+              src={`${API_BASE}/uploads/${product.prodimage}`}
+              alt={product.prodname}
             />
 
             <h2 className="text-lg font-bold text-gray-900">
