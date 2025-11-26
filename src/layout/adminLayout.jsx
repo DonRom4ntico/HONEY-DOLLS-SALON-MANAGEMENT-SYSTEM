@@ -3,7 +3,9 @@ import {
   Bell, Home, Calendar, Megaphone, Box, ArrowRightLeft, Trash2, AlertTriangle, 
   Package, Users, Building, FileText, DollarSign, Archive, PlusCircle, 
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Store, LogOut, Menu, 
-  PlusSquare, BellPlus, User, Settings  // Added User & Settings
+  PlusSquare, BellPlus, User, Settings,  // Added User & Settings
+  Plus,
+  ShieldAlert
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -20,11 +22,13 @@ export default function AdminLayout({ children, title }) {
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/adminDashboard' },
-    { icon: Calendar, label: 'Staff Schedule', path: '/adminStaffSchedule' },
+    { icon: User, label: 'Add New Staff', path: '/addStaff' },
+    { icon: ShieldAlert, label: 'Add New Admin', path: '/addAdmin' },
     { icon: Megaphone, label: 'Announcements', path: '/adminAnnouncement' },
     { header: 'Products' },
     { icon: ArrowRightLeft, label: 'Products Transfer', path: '/adminProductTransfer' },
     { icon: Box, label: 'Products Sold', path: '/adminProductSold' },
+    { icon: FileText, label: 'Product Usage', path: '/adminProductUsage' },
     { icon: Trash2, label: 'Products Wasted', path: '/adminProductWaste' },
     { icon: AlertTriangle, label: 'Products Damaged', path: '/adminProductDamage' },
     {
@@ -33,25 +37,21 @@ export default function AdminLayout({ children, title }) {
       dropdown: true,
       items: [
         { icon: Users, label: 'Customer', path: '/customerReturnedProducts' },
-        { icon: Store, label: 'Supplier', path: '/supplier' },
-        { icon: Building, label: 'Branches', path: '/branches' },
+        { icon: Store, label: 'Supplier', path: '/supplierReturn' },
+        { icon: Building, label: 'Branches', path: '/branchReturn' },
       ],
     },
     { header: 'Action' },
-    { icon: FileText, label: 'Record Product Usage', path: '/adminProductUsage' },
-    { icon: ArrowRightLeft, label: 'Transfer Products', path: '/adminProductTransfer' },
-    { icon: Trash2, label: 'Record Product Waste', path: '/recordProductWaste' },
-    { icon: AlertTriangle, label: 'Record Product Damaged', path: '/adminProductDamage' },
     { icon: DollarSign, label: 'Supplier Purchases', path: '/supplierPurchases' },
-    { icon: PlusCircle, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
-    { icon: BellPlus, label: 'Display Services', path: '/serviceDisplay' },
-    { icon: PlusSquare, label: 'Product Display', path: '/productDisplay'},
-    { icon: Archive, label: 'Transaction', path: '/transaction' },
+    { icon: PlusSquare, label: 'Supplier Purchases Record', path: '/supplierPurRecord' },
+    { icon: PlusCircle, label: 'Add Product Display', path: '/adminDisplayProduct' },
+    { icon: Plus, label: 'Service Display', path: '/serviceDisplay' },
+    { icon: Archive, label: 'Transaction', path: '/Transaction' },
     { icon: Box, label: 'Inventory', path: '/inventory' },
   ];
 
   const currentPath = location.pathname;
-  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplier', '/branches'].includes(currentPath);
+  const isReturnedProductsActive = ['/customerReturnedProducts', '/supplierReturn', '/branches'].includes(currentPath);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
