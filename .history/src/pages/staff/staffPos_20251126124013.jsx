@@ -1,7 +1,7 @@
 import { Bell, Search, Printer } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import CustomerLayout from "../../layout/staffLayout";
+import CustomerLayout from "../../layout/customerLayout";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 

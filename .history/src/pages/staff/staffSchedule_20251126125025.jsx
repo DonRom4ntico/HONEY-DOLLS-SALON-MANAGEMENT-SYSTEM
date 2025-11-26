@@ -127,6 +127,11 @@ export default function StaffSchedule() {
                   </div>
                 </div>
 
+                {/* View My Schedule Button */}
+                <button className="mt-6 w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md transition">
+                  View My Schedule
+                </button>
+
                 {/* Pending Appointments */}
                 <div className="mt-6">
                   <h3 className="font-semibold text-gray-800 mb-3">

@@ -1,3 +1,4 @@
+// src/pages/ProductDisplay.jsx
 import {
   Search,
   ChevronDown,
@@ -39,7 +40,7 @@ export default function ProductDisplay() {
 
   const [products, setProducts] = useState([]);
 
-  // Fetch all products
+  // Fetch products
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get(`${API_BASE}/products`);
@@ -53,7 +54,7 @@ export default function ProductDisplay() {
     fetchProducts();
   }, []);
 
-  // Filter + sort list
+  // Filter & Sort
   const filtered = products
     .filter(
       (item) =>
@@ -74,87 +75,82 @@ export default function ProductDisplay() {
     currentPage * itemsPerPage
   );
 
-  // Image Upload
+  // Image upload
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setNewProduct((prev) => ({ ...prev, prodimage: file }));
   };
 
-  // Save or Update
+  // Add or Update product
   const handleSaveProduct = async () => {
     try {
       const formData = new FormData();
       formData.append("prodname", newProduct.prodname);
       formData.append("prodcat", newProduct.prodcat);
       formData.append("price", newProduct.price);
-
-      if (newProduct.prodimage) {
+      if (newProduct.prodimage)
         formData.append("prodimage", newProduct.prodimage);
-      }
 
       if (editProduct) {
-        // UPDATE PRODUCT
+        // UPDATE
         const { data } = await axios.put(
           `${API_BASE}/products/${editProduct.productid}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
-
         setProducts((prev) =>
           prev.map((p) =>
             p.productid === data.product.productid ? data.product : p
           )
         );
       } else {
-        // CREATE PRODUCT
+        // CREATE
         const { data } = await axios.post(`${API_BASE}/products`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setProducts((prev) => [...prev, data.product]);
       }
 
-      // Reset everything
       setNewProduct({ prodname: "", prodcat: "", price: "", prodimage: null });
       setEditProduct(null);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to save product:", error);
-      alert("Failed to save product. Check console for more info.");
+      alert("Failed to save product. Check console for details.");
     }
   };
 
-  // Delete Product
+  // Delete product
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
-
     try {
       await axios.delete(`${API_BASE}/products/${id}`);
       setProducts((prev) => prev.filter((p) => p.productid !== id));
     } catch (error) {
-      console.error("Delete error:", error);
-      alert("Failed to delete product.");
+      console.error("Failed to delete product:", error);
+      alert("Failed to delete product. Check console for details.");
     }
   };
 
-  // When clicking EDIT
+  // Open modal for editing
   const handleEdit = (product) => {
     setEditProduct(product);
-
     setNewProduct({
       prodname: product.prodname,
       prodcat: product.prodcat,
       price: product.price,
-      prodimage: null, // user may upload a new one
+      prodimage: null, // optional to upload new image
     });
-
     setIsModalOpen(true);
   };
 
   return (
     <AdminLayout title="Product Display">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-full mx-auto">
-        {/* Header */}
+        {/* Header + Add Button */}
         <div className="flex justify-between items-start mb-8">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
@@ -188,7 +184,7 @@ export default function ProductDisplay() {
           </button>
         </div>
 
-        {/* Search + Sort */}
+        {/* Filters */}
         <div className="flex flex-wrap gap-4 mb-8 items-center">
           <div className="relative flex-1 min-w-[300px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -318,7 +314,6 @@ export default function ProductDisplay() {
                 </button>
               </div>
 
-              {/* Image Upload */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Product Image
@@ -331,9 +326,13 @@ export default function ProductDisplay() {
                         alt="Preview"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
-                    ) : editProduct?.prodimage ? (
+                    ) : editProduct && editProduct.prodimage ? (
                       <img
-                        src={`${API_BASE}/uploads/${editProduct.prodimage}`}
+                        src={
+                          newProduct.prodimage
+                            ? URL.createObjectURL(newProduct.prodimage)
+                            : `http://localhost:3000/uploads/${newProduct.oldImage}`
+                        }
                         alt="Preview"
                         className="mx-auto max-h-48 rounded-xl object-cover shadow-lg"
                       />
@@ -359,9 +358,7 @@ export default function ProductDisplay() {
                 />
               </div>
 
-              {/* Inputs */}
               <div className="space-y-5">
-                {/* Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Product Name
@@ -377,7 +374,6 @@ export default function ProductDisplay() {
                   />
                 </div>
 
-                {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Product Category
@@ -398,7 +394,6 @@ export default function ProductDisplay() {
                   </select>
                 </div>
 
-                {/* Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price (₱)
@@ -417,7 +412,6 @@ export default function ProductDisplay() {
                 </div>
               </div>
 
-              {/* Buttons */}
               <div className="flex gap-4 mt-8">
                 <button
                   onClick={() => setIsModalOpen(false)}

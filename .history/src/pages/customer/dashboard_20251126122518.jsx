@@ -79,8 +79,7 @@ const Dashboard = () => {
             Services and Prices
           </h2>
           <p className="italic text-[#80383f]">
-            “Experience top-tier beauty services crafted just for you — all at
-            prices that bring luxury within reach.”
+            “Experience top-tier beauty services crafted just for you — all at prices that bring luxury within reach.”
           </p>
         </div>
 
@@ -117,9 +116,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <a className="block mt-4 text-sm underline text-pink-700">
-                View all
-              </a>
+              <a className="block mt-4 text-sm underline text-pink-700">View all</a>
             </div>
           </div>
 
@@ -149,9 +146,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <a className="block mt-4 text-sm underline text-pink-700">
-                View all
-              </a>
+              <a className="block mt-4 text-sm underline text-pink-700">View all</a>
             </div>
 
             <img
@@ -192,9 +187,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <a className="block mt-4 text-sm underline text-pink-700">
-                View all
-              </a>
+              <a className="block mt-4 text-sm underline text-pink-700">View all</a>
             </div>
           </div>
 
@@ -224,9 +217,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <a className="block mt-4 text-sm underline text-pink-700">
-                View all
-              </a>
+              <a className="block mt-4 text-sm underline text-pink-700">View all</a>
             </div>
 
             <img
@@ -267,9 +258,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <a className="block mt-4 text-sm underline text-pink-700">
-                View all
-              </a>
+              <a className="block mt-4 text-sm underline text-pink-700">View all</a>
             </div>
           </div>
         </div>

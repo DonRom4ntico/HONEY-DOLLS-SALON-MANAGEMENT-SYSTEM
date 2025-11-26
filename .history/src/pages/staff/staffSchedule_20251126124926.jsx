@@ -64,6 +64,34 @@ export default function StaffSchedule() {
   return (
     <StaffLayout>
       <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
+        {/* ====================== HEADER ====================== */}
+        <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src="/src/assets/honeydolls.jpg"
+                alt="Honey Dolls"
+                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
+              />
+              <div>
+                <h1 className="text-xl font-bold text-orange-900">
+                  Honey Dolls & Brilliant
+                </h1>
+                <p className="text-sm text-orange-800 font-medium">
+                  Beauty Hub — Davao
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Bell className="w-6 h-6 text-yellow-600" />
+              <span className="text-orange-900 font-medium text-sm hidden sm:inline">
+                Welcome, Alita Smith{" "}
+                <span className="text-yellow-600">Philippines</span>
+              </span>
+            </div>
+          </div>
+        </header>
+
         {/* ====================== MAIN ====================== */}
         <main className="flex-1 px-6 py-8 max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-3 gap-6">
@@ -126,6 +154,11 @@ export default function StaffSchedule() {
                     })}
                   </div>
                 </div>
+
+                {/* View My Schedule Button */}
+                <button className="mt-6 w-full bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] text-white font-bold py-3 rounded-full shadow hover:shadow-md transition">
+                  View My Schedule
+                </button>
 
                 {/* Pending Appointments */}
                 <div className="mt-6">
