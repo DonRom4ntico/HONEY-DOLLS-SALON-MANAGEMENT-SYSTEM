@@ -38,7 +38,6 @@ const CustomerMyOrder = () => {
     <CustomerLayout>
       <main className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 pt-20 pb-16">
         <div className="max-w-4xl mx-auto px-6">
-
           <h1 className="text-4xl font-bold text-orange-900 text-center mb-10">
             My Orders
           </h1>
@@ -56,7 +55,9 @@ const CustomerMyOrder = () => {
                     alt={product.name}
                     className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
                     loading="lazy"
-                    onError={(e) => (e.target.src = "/images/placeholder-product.jpg")}
+                    onError={(e) =>
+                      (e.target.src = "/images/placeholder-product.jpg")
+                    }
                   />
                 </div>
 
@@ -70,7 +71,9 @@ const CustomerMyOrder = () => {
                     <h3 className="text-2xl font-bold text-gray-900 pr-12">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">{product.category}</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {product.category}
+                    </p>
 
                     <div className="flex items-center gap-2 mt-3">
                       <div className="flex">
@@ -96,7 +99,9 @@ const CustomerMyOrder = () => {
 
                     {/* Quantity — Stable layout */}
                     <div className="flex items-center gap-5 mt-6">
-                      <span className="text-gray-700 font-semibold">Quantity:</span>
+                      <span className="text-gray-700 font-semibold">
+                        Quantity:
+                      </span>
                       <div className="flex items-center border-2 border-gray-300 rounded-full bg-white">
                         <button
                           onClick={() => handleQuantityChange(product.id, -1)}

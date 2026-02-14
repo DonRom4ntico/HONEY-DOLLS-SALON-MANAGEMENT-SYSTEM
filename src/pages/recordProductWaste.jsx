@@ -1,27 +1,33 @@
 // src/pages/recordProductWaste.jsx
-import { ChevronDown } from 'lucide-react';
-import AdminLayout from '../layout/adminLayout';
-import { useState } from 'react';
+import { ChevronDown } from "lucide-react";
+import AdminLayout from "../layout/adminLayout";
+import { useState } from "react";
 
 export default function RecordProductWaste() {
-  const [product, setProduct] = useState('Hair Spa Mask');
-  const [reason, setReason] = useState('Expired – Product reached shelf life date (Oct 25, 2025)');
-  const [date] = useState('Oct 27, 2025');
-  const [time] = useState('4:30 PM');
-  const [user, setUser] = useState('Jessa Mae');
+  const [product, setProduct] = useState("Hair Spa Mask");
+  const [reason, setReason] = useState(
+    "Expired – Product reached shelf life date (Oct 25, 2025)",
+  );
+  const [date] = useState("Oct 27, 2025");
+  const [time] = useState("4:30 PM");
+  const [user, setUser] = useState("Jessa Mae");
 
   return (
     <AdminLayout title="Product Waste Record">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Product Waste Record</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            Product Waste Record
+          </h2>
           <p className="text-sm text-gray-600 mt-1">Record Details</p>
         </div>
 
         <form className="space-y-6">
           {/* Product Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Product Name
+            </label>
             <div className="relative">
               <select
                 value={product}
@@ -38,7 +44,9 @@ export default function RecordProductWaste() {
 
           {/* Reason */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reason
+            </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -50,7 +58,9 @@ export default function RecordProductWaste() {
           {/* Date & Time */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -62,7 +72,9 @@ export default function RecordProductWaste() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Time
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -77,7 +89,9 @@ export default function RecordProductWaste() {
 
           {/* User Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">User Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              User Name
+            </label>
             <div className="relative">
               <select
                 value={user}

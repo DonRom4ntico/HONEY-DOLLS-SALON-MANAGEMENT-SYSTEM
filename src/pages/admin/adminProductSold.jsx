@@ -1,6 +1,6 @@
 import AdminLayout from "../../layout/adminLayout";
-import { Search, Printer, Menu, X, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Printer, ChevronDown } from "lucide-react";
+import React, { useState } from "react";
 
 export default function AdminProductsSold() {
   return (
@@ -11,20 +11,52 @@ export default function AdminProductsSold() {
 }
 
 function ProductsSoldContent() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState('Davao');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("Davao");
 
   const sales = [
-    { id: 1, product: 'Honey Glow Serum', customer: 'Maria Santos', qty: 2, subtotal: 1200, date: '2025-10-27', time: '10:30' },
-    { id: 2, product: 'Keratin Smooth Oil', customer: 'Alyssa Cruz', qty: 1, subtotal: 650, date: '2025-10-27', time: '11:15' },
-    { id: 3, product: 'Lash Nourish Set', customer: 'Bea Dela Cruz', qty: 3, subtotal: 900, date: '2025-10-27', time: '12:40' },
-    { id: 4, product: 'Silky Shampoo', customer: 'Jessa Mae', qty: 1, subtotal: 450, date: '2025-10-27', time: '14:20' },
+    {
+      id: 1,
+      product: "Honey Glow Serum",
+      customer: "Maria Santos",
+      qty: 2,
+      subtotal: 1200,
+      date: "2025-10-27",
+      time: "10:30",
+    },
+    {
+      id: 2,
+      product: "Keratin Smooth Oil",
+      customer: "Alyssa Cruz",
+      qty: 1,
+      subtotal: 650,
+      date: "2025-10-27",
+      time: "11:15",
+    },
+    {
+      id: 3,
+      product: "Lash Nourish Set",
+      customer: "Bea Dela Cruz",
+      qty: 3,
+      subtotal: 900,
+      date: "2025-10-27",
+      time: "12:40",
+    },
+    {
+      id: 4,
+      product: "Silky Shampoo",
+      customer: "Jessa Mae",
+      qty: 1,
+      subtotal: 450,
+      date: "2025-10-27",
+      time: "14:20",
+    },
   ];
 
-  const filteredSales = sales.filter(sale =>
-    sale.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.customer.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSales = sales.filter(
+    (sale) =>
+      sale.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.customer.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handlePrint = () => window.print();
@@ -34,111 +66,84 @@ function ProductsSoldContent() {
       {/* PRINT STYLES */}
       <style jsx>{`
         @media print {
-          .no-print, .hamburger, .sidebar, .overlay { 
-            display: none !important; 
+          .no-print {
+            display: none !important;
           }
-          .print-only { 
-            display: block !important; 
+          body {
+            background: white !important;
           }
-          body { background: white !important; }
-          .shadow-lg { box-shadow: none !important; }
-          .rounded-2xl { border: 1px solid #ddd; }
+          .shadow-lg {
+            box-shadow: none !important;
+          }
+          .rounded-2xl {
+            border: 1px solid #ddd;
+          }
         }
-        .print-only { display: none; }
       `}</style>
 
-      {/* HEADER */}
-      <header className=" shadow- no-print sticky top-0 z-50">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <h1 className="text-lg md:text-xl font-bold text-gray-800">Products Sold</h1>
+      {/* MAIN CONTENT */}
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* HEADER */}
+        <header className="mb-6">
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
+            Products Sold
+          </h1>
+        </header>
 
-
-
-          {/* MOBILE HAMBURGER */}
-          <button
-            className="hamburger md:hidden bg-white p-2 rounded-full shadow-md"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <Menu size={22} />
-          </button>
-        </div>
-      </header>
-    {/* BLACK LINE SEPARATOR */}
+        {/* DIVIDER */}
         <div className="w-full h-[1px] bg-gray-300 mb-6"></div>
-      {/* SIDEBAR OVERLAY */}
-      {isSidebarOpen && (
-        <div
-          className="overlay fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
 
-      {/* SLIDE-IN SIDEBAR */}
-      <aside className={`
-        sidebar fixed top-0 left-0 h-full w-72 bg-white shadow-xl transform z-50 md:hidden transition-transform duration-300
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-      `}>
-        <div className="p-4 flex justify-between items-center border-b">
-          <h2 className="text-lg font-bold">Menu</h2>
-          <button onClick={() => setIsSidebarOpen(false)}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <li className="p-3 rounded-lg bg-gray-100 font-semibold">Dashboard</li>
-            <li className="p-3 rounded-lg hover:bg-gray-100">Products</li>
-            <li className="p-3 rounded-lg hover:bg-gray-100">Products Sold</li>
-            <li className="p-3 rounded-lg hover:bg-gray-100">Products Wasted</li>
-            <li className="p-3 rounded-lg hover:bg-gray-100">Branches</li>
-          </ul>
-        </nav>
-      </aside>
-
-      {/* CONTENT WRAPPER */}
-      <div className="p-6">
-
-        {/* SEARCH + BRANCH + PRINT IN ONE LINE */}
-        <div className="no-print flex items-center justify-between bg-white p-3 rounded-xl shadow mb-6">
-
-          {/* LEFT SIDE: SEARCH + DROPDOWN */}
-          <div className="flex items-center gap-3">
-
-            {/* SMALL SEARCH BAR */}
-            <div className="flex items-center gap-2 bg-gray-50 border px-3 py-2 rounded-full w-[220px]">
-              <Search size={18} className="text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="flex-1 outline-none text-sm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* DROPDOWN */}
-            <button className="flex items-center gap-2 bg-gray-50 border px-4 py-2 rounded-full text-sm shadow-sm">
-              {selectedBranch} Branch <ChevronDown size={16} />
-            </button>
-
+        {/* SEARCH + PRINT */}
+        <div className="no-print flex items-center justify-between gap-4 mb-6">
+          {/* SEARCH */}
+          <div
+            className="flex items-center gap-2 bg-gray-50 border px-4 py-2 rounded-full
+                       w-full sm:w-[260px] lg:w-[380px]"
+          >
+            <Search size={18} className="text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full outline-none text-sm bg-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
-          {/* RIGHT SIDE: PRINT BUTTON */}
           <button
             onClick={handlePrint}
-            className="no-print bg-gray-50 flex items-center gap-2 px-4 py-2 rounded-full border shadow text-gray-700 hover:bg-gray-100 transition text-sm"
+            style={{
+              background: "linear-gradient(to right, #ec4899, #f97316)",
+              boxShadow: "0 4px 15px rgba(236, 72, 153, 0.4)",
+            }}
+            className="
+    flex items-center gap-2
+    rounded-full text-white font-medium
+    px-4 py-2 text-sm
+    sm:px-5 sm:py-2.5
+    lg:px-6 lg:py-3 lg:text-base
+    transition hover:scale-[1.02]
+    whitespace-nowrap flex-shrink-0
+  "
           >
-            <Printer size={18} /> Print
+            <Printer className="w-4 h-4 sm:w-5 sm:h-5" />
+            Print
           </button>
-
         </div>
 
         {/* TABLE */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
-              <tr className="border-b text-left text-gray-600">
+              <tr className="text-left text-gray-600">
+                <th className="pb-3">
+                  <button className="flex items-center gap-2 bg-gray-50 border px-4 py-2 rounded-full text-sm shadow-sm">
+                    {selectedBranch} Branch <ChevronDown size={16} />
+                  </button>
+                </th>
+                <th colSpan="5"></th>
+              </tr>
+              <tr className="border-b text-gray-600">
                 <th className="pb-3">Product</th>
                 <th className="pb-3">Customer</th>
                 <th className="pb-3 text-center">Qty</th>
@@ -153,7 +158,9 @@ function ProductsSoldContent() {
                   <td className="py-3">{sale.product}</td>
                   <td>{sale.customer}</td>
                   <td className="text-center">{sale.qty}</td>
-                  <td className="text-right">₱{sale.subtotal.toLocaleString()}</td>
+                  <td className="text-right">
+                    ₱{sale.subtotal.toLocaleString()}
+                  </td>
                   <td className="text-right">{sale.date}</td>
                   <td className="text-right">{sale.time}</td>
                 </tr>

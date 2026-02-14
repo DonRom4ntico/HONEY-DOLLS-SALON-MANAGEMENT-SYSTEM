@@ -2,6 +2,7 @@
 import { Bell, ChevronDown, RefreshCw, Download, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import StaffLayout from "../../layout/staffLayout";
+import React from "react";
 
 export default function StaffProdUsage() {
   const [product, setProduct] = useState("Hair Serum");
@@ -9,7 +10,7 @@ export default function StaffProdUsage() {
   const [usedQty, setUsedQty] = useState(5);
   const [remainingQty, setRemainingQty] = useState(45);
   const [remarks, setRemarks] = useState(
-    "Used during hair treatment service (2 clients)"
+    "Used during hair treatment service (2 clients)",
   );
 
   const [viewedId, setViewedId] = useState(null);
@@ -81,8 +82,8 @@ export default function StaffProdUsage() {
           newRemaining <= 20
             ? "bg-red-100"
             : newRemaining <= 50
-            ? "bg-yellow-100"
-            : "bg-green-100";
+              ? "bg-yellow-100"
+              : "bg-green-100";
 
         const updatedRecord = {
           ...existing,
@@ -99,8 +100,8 @@ export default function StaffProdUsage() {
           newRemaining <= 20
             ? "bg-red-100"
             : newRemaining <= 50
-            ? "bg-yellow-100"
-            : "bg-green-100";
+              ? "bg-yellow-100"
+              : "bg-green-100";
 
         const newRecord = {
           id: Date.now(),

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import CustomerLayout from "../../layout/customerLayout";
+
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Custapp = () => {
@@ -96,7 +97,7 @@ const Custapp = () => {
     const pad = (n) => String(n).padStart(2, "0");
     const toYMDHMS = (d) =>
       `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-        d.getHours()
+        d.getHours(),
       )}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
     const servicesPayload = formData.services.map((serviceid) => {
@@ -120,10 +121,10 @@ const Custapp = () => {
         formData.recurrence === "Weekly"
           ? "FREQ=WEEKLY;INTERVAL=1"
           : formData.recurrence === "Daily"
-          ? "FREQ=DAILY;INTERVAL=1"
-          : formData.recurrence === "Monthly"
-          ? "FREQ=MONTHLY;INTERVAL=1"
-          : null,
+            ? "FREQ=DAILY;INTERVAL=1"
+            : formData.recurrence === "Monthly"
+              ? "FREQ=MONTHLY;INTERVAL=1"
+              : null,
     };
 
     setLoading(true);
@@ -156,7 +157,8 @@ const Custapp = () => {
       setLoading(false);
     }
   };
-
+  const [serviceSearch, setServiceSearch] = useState("");
+  const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const estimatedHours = formData.services.length;
 
   const estimatedTotal = formData.services.length
@@ -206,31 +208,87 @@ const Custapp = () => {
                 </div>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-6 relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Choose Services
                 </label>
-                <div className="space-y-2">
-                  {services.length === 0 && (
-                    <p className="text-sm text-gray-500">Loading services...</p>
+
+                {/* Combobox input */}
+                <div
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 cursor-pointer bg-white"
+                  onClick={() => setServiceDropdownOpen(!serviceDropdownOpen)}
+                >
+                  {formData.services.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {services
+                        .filter((s) => formData.services.includes(s.serviceid))
+                        .map((s) => (
+                          <span
+                            key={s.serviceid}
+                            className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {s.servicetype}
+                          </span>
+                        ))}
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 text-sm">
+                      Select service(s)...
+                    </span>
                   )}
-                  {services.map((svc) => (
-                    <label
-                      key={svc.serviceid}
-                      className="flex items-center gap-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.services.includes(svc.serviceid)}
-                        onChange={() => toggleService(svc.serviceid)}
-                        className="w-4 h-4 text-orange-500 rounded"
-                      />
-                      <span>
-                        {svc.servicetype} — ₱{svc.amount ?? svc.price ?? "—"}
-                      </span>
-                    </label>
-                  ))}
                 </div>
+
+                {/* Dropdown */}
+                {serviceDropdownOpen && (
+                  <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
+                    {/* Search bar */}
+                    <input
+                      type="text"
+                      placeholder="Search services..."
+                      value={serviceSearch}
+                      onChange={(e) => setServiceSearch(e.target.value)}
+                      className="w-full px-3 py-2 border-b border-gray-200 text-sm outline-none"
+                    />
+
+                    {/* Options */}
+                    <div className="max-h-56 overflow-y-auto">
+                      {services
+                        .filter((s) =>
+                          s.servicetype
+                            .toLowerCase()
+                            .includes(serviceSearch.toLowerCase()),
+                        )
+                        .map((svc) => (
+                          <div
+                            key={svc.serviceid}
+                            onClick={() => toggleService(svc.serviceid)}
+                            className={`px-3 py-2 text-sm cursor-pointer flex justify-between items-center hover:bg-orange-50 ${
+                              formData.services.includes(svc.serviceid)
+                                ? "bg-orange-100"
+                                : ""
+                            }`}
+                          >
+                            <span>
+                              {svc.servicetype} — ₱
+                              {svc.amount ?? svc.price ?? "—"}
+                            </span>
+
+                            {formData.services.includes(svc.serviceid) && (
+                              <span className="text-orange-600 font-semibold">
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                        ))}
+
+                      {services.length === 0 && (
+                        <p className="px-3 py-2 text-sm text-gray-500">
+                          Loading services...
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -324,15 +382,15 @@ const Custapp = () => {
                 <p>
                   <strong>Staff:</strong>{" "}
                   {staffList.find(
-                    (s) => String(s.staffid) === String(formData.staff)
+                    (s) => String(s.staffid) === String(formData.staff),
                   )
                     ? `${
                         staffList.find(
-                          (s) => String(s.staffid) === String(formData.staff)
+                          (s) => String(s.staffid) === String(formData.staff),
                         ).firstname
                       } ${
                         staffList.find(
-                          (s) => String(s.staffid) === String(formData.staff)
+                          (s) => String(s.staffid) === String(formData.staff),
                         ).lastname
                       }`
                     : "—"}

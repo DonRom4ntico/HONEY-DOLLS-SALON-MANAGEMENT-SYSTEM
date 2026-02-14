@@ -1,6 +1,7 @@
 // src/layout/StaffLayout.jsx
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   User,
   Settings,
@@ -16,82 +17,104 @@ import {
 
 export default function StaffLayout({ children }) {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const staffName = "Anna"; // You can replace with dynamic staff name
+  const [staffName, setStaffName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const isActive = (path) => location.pathname === path;
 
   const navLinks = [
-    { name: "Dashboard", path: "/staffDashboard" },
-    { name: "Products", path: "/staffProducts" },
-    { name: "Orders", path: "/staffOrders" },
-    { name: "Appointments", path: "/staffAppointments" },
+    { name: "Schedule", path: "/staffSchedule" },
+    { name: "Usage", path: "/staffProdUsage" },
+    { name: "POS", path: "/staffPOS" },
   ];
+
+  // 🔥 FETCH STAFF NAME FROM API
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const res = await axios.get("http://localhost:3000/api/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setStaffName(res.data.fullName);
+      } catch (err) {
+        console.error(
+          "Failed to fetch staff:",
+          err.response?.data || err.message,
+        );
+        setStaffName("Staff");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const goTo = (path) => {
+    navigate(path);
+    setMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="min-h-screen text-gray-900 font-sans">
-      {/* NAVBAR */}
-      <header className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm sticky top-0 z-50">
+      <nav className="bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] shadow-sm sticky top-0 z-50">
         <div className="px-6 py-4 flex items-center justify-between">
-          {/* LEFT: LOGO + TITLE */}
+          {/* LEFT SIDE */}
           <div className="flex items-center gap-4">
-            {/* MOBILE BURGER */}
-            <button
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="lg:hidden text-orange-900"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-7 h-7" />
-              ) : (
-                <Menu className="w-7 h-7" />
-              )}
-            </button>
-
-            {/* LOGO + BRAND */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-orange-600 font-bold text-xl">HD</span>
+            <div className="flex items-center sm:mr-64 gap-3 flex-shrink-0">
+              <div className="w-10 h-10 sm:w-16 sm:h-16 bg-white rounded-full shadow-md">
+                <img
+                  src="/src/assets/mainlogo.jpg"
+                  alt="Logo"
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-orange-900">
+              <div className="sm:flex flex-col">
+                <h1 className="font-bold text-m sm:text-xl text-orange-900">
                   Honey Dolls & Brilliant
                 </h1>
-                <p className="text-sm text-orange-800 font-medium">
-                  Beauty Hub — Davao
-                </p>
+                <p className="text-xs text-orange-800">Beauty Hub — Davao</p>
               </div>
             </div>
           </div>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden lg:flex items-center gap-10 text-base font-semibold text-orange-900">
+          {/* NAV LINKS */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`relative transition-all ${
+                className={`font-semibold text-m transition-all ${
                   isActive(link.path)
-                    ? "text-yellow-700 font-bold"
-                    : "hover:text-yellow-600"
+                    ? "text-white border-b-2 border-white"
+                    : "text-white hover:text-yellow-100"
                 }`}
               >
                 {link.name}
-                {isActive(link.path) && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-                )}
               </Link>
             ))}
-          </nav>
+          </div>
 
-          {/* RIGHT: Notifications + Profile */}
-          <div className="flex items-center gap-4">
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-10">
             <Bell className="w-6 h-6 text-yellow-600" />
-            <span className="hidden sm:inline text-orange-900 font-medium text-sm">
-              Logged in:{" "}
-              <span className="text-yellow-600">{staffName} (Staff)</span>
-            </span>
 
             {/* PROFILE DROPDOWN */}
             <div className="relative">
@@ -99,22 +122,21 @@ export default function StaffLayout({ children }) {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 focus:outline-none"
               >
-                <div className="w-11 h-11 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md">
                   <img
-                    src="/src/assets/staff.jpg"
+                    src="/src/assets/nigga.jpg"
                     alt="Profile"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/80/ffcdd2/000000?text=S";
-                    }}
                   />
                 </div>
                 <ChevronDown
-                  className={`w-5 h-5 text-white transition-transform duration-200 ${
+                  className={`w-4 h-4 text-white transition-transform ${
                     dropdownOpen ? "rotate-180" : ""
                   }`}
                 />
+                <p className="hidden sm:flex font-bold text-pink-900">
+                  {loading ? "Loading..." : staffName}
+                </p>
               </button>
 
               {dropdownOpen && (
@@ -123,64 +145,40 @@ export default function StaffLayout({ children }) {
                     className="fixed inset-0 z-40"
                     onClick={() => setDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-4 -mr-3 w-64 bg-white rounded-xl shadow-2xl border border-pink-100 z-50 overflow-hidden">
+                  <div className="absolute right-0 mt-4 w-64 bg-white rounded-xl shadow-2xl border border-pink-100 z-50 overflow-hidden">
                     <div className="py-4 px-5 bg-gradient-to-r from-pink-50 to-pink-100 border-b border-pink-200">
                       <p className="text-sm text-pink-700 font-medium">
                         Signed in as
                       </p>
                       <p className="text-lg font-bold text-pink-900">
-                        {staffName}
+                        {loading ? "Loading..." : staffName}
                       </p>
                     </div>
+
                     <div className="py-2">
                       <Link
                         to="/staffProfile"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
+                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50"
                       >
-                        <User className="w-5 h-5" /> <span>Profile</span>
+                        <User className="w-5 h-5" /> Profile
                       </Link>
+
                       <Link
                         to="/staffAppointments"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
+                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50"
                       >
-                        <Calendar className="w-5 h-5" />{" "}
-                        <span>Appointments</span>
-                      </Link>
-                      <Link
-                        to="/staffOrders"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
-                      >
-                        <Package className="w-5 h-5" /> <span>Orders</span>
-                      </Link>
-                      <Link
-                        to="/staffProducts"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
-                      >
-                        <ShoppingCart className="w-5 h-5" />{" "}
-                        <span>Products</span>
-                      </Link>
-                      <Link
-                        to="/staffSettings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-4 px-6 py-3 hover:bg-pink-50 text-gray-800 transition"
-                      >
-                        <Settings className="w-5 h-5" /> <span>Settings</span>
+                        <Calendar className="w-5 h-5" /> Appointments
                       </Link>
 
                       <hr className="my-3 border-pink-100" />
 
                       <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          alert("Logged out successfully!");
-                        }}
-                        className="w-full flex items-center gap-4 px-6 py-3 hover:bg-red-50 text-red-600 font-medium transition text-left"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-4 px-6 py-3 hover:bg-red-50 text-red-600 font-medium text-left"
                       >
-                        <LogOut className="w-5 h-5" /> <span>Log out</span>
+                        <LogOut className="w-5 h-5" /> Log out
                       </button>
                     </div>
                   </div>
@@ -189,34 +187,9 @@ export default function StaffLayout({ children }) {
             </div>
           </div>
         </div>
+      </nav>
 
-        {/* MOBILE MENU */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-gradient-to-r from-[#ffd36e] to-[#f59e9e] px-6 pb-4">
-            <nav className="flex flex-col gap-4 text-base font-semibold text-orange-900 mt-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`relative transition-all ${
-                    isActive(link.path)
-                      ? "text-yellow-700 font-bold"
-                      : "hover:text-yellow-600"
-                  }`}
-                >
-                  {link.name}
-                  {isActive(link.path) && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-1 bg-yellow-500 rounded-full"></span>
-                  )}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        )}
-      </header>
-
-      <main className="pt-0">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }

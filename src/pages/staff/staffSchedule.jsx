@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import StaffLayout from "../../layout/staffLayout";
+import React from "react";
 
 export default function StaffSchedule() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -177,8 +178,8 @@ export default function StaffSchedule() {
                       apt.status === "Completed"
                         ? "bg-green-100 text-green-700"
                         : apt.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700";
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700";
 
                     const statusIcon =
                       apt.status === "Completed" ? (
@@ -230,7 +231,7 @@ export default function StaffSchedule() {
                       >
                         {status}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
               </div>

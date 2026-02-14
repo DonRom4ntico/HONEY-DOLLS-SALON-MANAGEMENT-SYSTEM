@@ -2,6 +2,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+const navLinkStyle = {
+  display: "block",
+  padding: "0.75rem 1rem",
+  background: "white",
+  color: "#2c3e50",
+  textDecoration: "none",
+  borderRadius: "8px",
+  marginBottom: "0.5rem",
+  fontWeight: 500,
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+  transition: "all 0.2s",
+  cursor: "pointer",
+};
+
 const Home = () => {
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}>
@@ -22,28 +36,28 @@ const Home = () => {
         {/* CUSTOMER */}
         <div>
           <h3 style={{ color: "#e67e22", margin: "0.5rem 0" }}>Customer</h3>
-          <Link to="/dashboard" className="nav-link">
+          <Link to="/dashboard" style={navLinkStyle}>
             Dashboard
           </Link>
-          <Link to="/custapp" className="nav-link">
+          <Link to="/custapp" style={navLinkStyle}>
             Customer Appointment
           </Link>
-          <Link to="/customerTransaction" className="nav-link">
+          <Link to="/customerTransaction" style={navLinkStyle}>
             Customer Transaction
           </Link>
-          <Link to="/prodDetails" className="nav-link">
+          <Link to="/prodDetails" style={navLinkStyle}>
             Product Details
           </Link>
-          <Link to="/customerProd" className="nav-link">
+          <Link to="/customerProd" style={navLinkStyle}>
             Customer Product
           </Link>
-          <Link to="/customerMyOrder" className="nav-link">
+          <Link to="/customerMyOrder" style={navLinkStyle}>
             My Orders
           </Link>
-          <Link to="/customerReturnForm" className="nav-link">
+          <Link to="/customerReturnForm" style={navLinkStyle}>
             Return Form
           </Link>
-          <Link to="/customerOR" className="nav-link">
+          <Link to="/customerOR" style={navLinkStyle}>
             Official Receipt
           </Link>
         </div>
@@ -51,13 +65,13 @@ const Home = () => {
         {/* STAFF */}
         <div>
           <h3 style={{ color: "#27ae60", margin: "0.5rem 0" }}>Staff</h3>
-          <Link to="/staffSchedule" className="nav-link">
+          <Link to="/staffSchedule" style={navLinkStyle}>
             Staff Schedule
           </Link>
-          <Link to="/staffProdUsage" className="nav-link">
+          <Link to="/staffProdUsage" style={navLinkStyle}>
             Product Usage
           </Link>
-          <Link to="/staffPos" className="nav-link">
+          <Link to="/staffPos" style={navLinkStyle}>
             POS
           </Link>
         </div>
@@ -65,46 +79,22 @@ const Home = () => {
         {/* ADMIN */}
         <div>
           <h3 style={{ color: "#8e44ad", margin: "0.5rem 0" }}>Admin</h3>
-          <Link to="/adminDashboard" className="nav-link">
+          <Link to="/adminDashboard" style={navLinkStyle}>
             Dashboard
           </Link>
-          <Link to="/branches" className="nav-link">
-            Branches
-          </Link>
-          <Link to="/productDisplay"> Product Display </Link>
         </div>
 
         {/* AUTH */}
         <div>
           <h3 style={{ color: "#34495e", margin: "0.5rem 0" }}>Auth</h3>
-          <Link to="/login" className="nav-link">
+          <Link to="/login" style={navLinkStyle}>
             Login
           </Link>
-          <Link to="/register" className="nav-link">
+          <Link to="/register" style={navLinkStyle}>
             Register
           </Link>
         </div>
       </nav>
-
-      <style jsx>{`
-        .nav-link {
-          display: block;
-          padding: 0.75rem 1rem;
-          background: white;
-          color: #2c3e50;
-          text-decoration: none;
-          border-radius: 8px;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-          transition: all 0.2s;
-        }
-        .nav-link:hover {
-          background: #f39c12;
-          color: white;
-          transform: translateY(-1px);
-        }
-      `}</style>
     </div>
   );
 };

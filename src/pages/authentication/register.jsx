@@ -31,8 +31,8 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        `${API_BASE}/customer/register`,
-        formData
+        `${API_BASE}/auth/register-customer`,
+        formData,
       );
       const { user, token } = response.data;
 

@@ -1,51 +1,102 @@
 // src/pages/AdminDisplayProduct.jsx
-import { useState } from 'react';
-import { Search, ChevronDown, Package } from 'lucide-react';
-import AdminLayout from '../../../layout/adminLayout';
+import React from "react";
+import { useState } from "react";
+import { Search, ChevronDown, Package } from "lucide-react";
+import AdminLayout from "../../../layout/adminLayout";
 
 export default function AdminDisplayProduct() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [supplierFilter, setSupplierFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('date-desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [supplierFilter, setSupplierFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("date-desc");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   const purchaseOrders = [
-    { id: 'PO-2025-001', supplier: 'GlowSupplies Inc.', product: 'Argan Oil Serum', unitCost: 350.00, orderDate: 'Oct 25, 2025', contact: '0917 825 5314' },
-    { id: 'PO-2025-002', supplier: 'LuxeBeauty PH', product: 'Keratin Shampoo', unitCost: 220.00, orderDate: 'Oct 27, 2025', contact: '0918 234 5567' },
-    { id: 'PO-2025-003', supplier: 'Honey Essentials', product: 'Vitamin C Toner', unitCost: 250.00, orderDate: 'Oct 28, 2025', contact: '0906 574 9982' },
-    { id: 'PO-2025-004', supplier: 'Velvet Touch Co.', product: 'Moisture Cream', unitCost: 410.00, orderDate: 'Oct 29, 2025', contact: '0918 850 3421' },
-    { id: 'PO-2025-005', supplier: 'PureSilk Supply', product: 'Aloe Gel', unitCost: 190.00, orderDate: 'Oct 30, 2025', contact: '0922 890 1277' },
-    { id: 'PO-2025-006', supplier: 'Radiant Glow', product: 'Whitening Lotion', unitCost: 310.00, orderDate: 'Nov 01, 2025', contact: '0916 885 8890' },
+    {
+      id: "PO-2025-001",
+      supplier: "GlowSupplies Inc.",
+      product: "Argan Oil Serum",
+      unitCost: 350.0,
+      orderDate: "Oct 25, 2025",
+      contact: "0917 825 5314",
+    },
+    {
+      id: "PO-2025-002",
+      supplier: "LuxeBeauty PH",
+      product: "Keratin Shampoo",
+      unitCost: 220.0,
+      orderDate: "Oct 27, 2025",
+      contact: "0918 234 5567",
+    },
+    {
+      id: "PO-2025-003",
+      supplier: "Honey Essentials",
+      product: "Vitamin C Toner",
+      unitCost: 250.0,
+      orderDate: "Oct 28, 2025",
+      contact: "0906 574 9982",
+    },
+    {
+      id: "PO-2025-004",
+      supplier: "Velvet Touch Co.",
+      product: "Moisture Cream",
+      unitCost: 410.0,
+      orderDate: "Oct 29, 2025",
+      contact: "0918 850 3421",
+    },
+    {
+      id: "PO-2025-005",
+      supplier: "PureSilk Supply",
+      product: "Aloe Gel",
+      unitCost: 190.0,
+      orderDate: "Oct 30, 2025",
+      contact: "0922 890 1277",
+    },
+    {
+      id: "PO-2025-006",
+      supplier: "Radiant Glow",
+      product: "Whitening Lotion",
+      unitCost: 310.0,
+      orderDate: "Nov 01, 2025",
+      contact: "0916 885 8890",
+    },
   ];
 
-  let filtered = purchaseOrders.filter(item =>
-    item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+  let filtered = purchaseOrders.filter(
+    (item) =>
+      item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.supplier.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  if (supplierFilter !== 'all') filtered = filtered.filter(i => i.supplier === supplierFilter);
+  if (supplierFilter !== "all")
+    filtered = filtered.filter((i) => i.supplier === supplierFilter);
 
   filtered.sort((a, b) => {
     const dateA = new Date(a.orderDate);
     const dateB = new Date(b.orderDate);
-    return sortOrder === 'date-desc' ? dateB - dateA : dateA - dateB;
+    return sortOrder === "date-desc" ? dateB - dateA : dateA - dateB;
   });
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginated = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   return (
     <AdminLayout title="">
       <div className="max-w-7xl mx-auto space-y-8">
-
-     {/* Header */}
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Honey Dolls • Brilliant Beauty Hub</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Honey Dolls • Brilliant Beauty Hub
+          </h1>
           <p className="text-sm text-gray-600 mt-2">
-            Add Product to Display Inventory<br />
-            Select purchase-order items and add them to your display inventory. Use search and filters to find items quickly.
+            Add Product to Display Inventory
+            <br />
+            Select purchase-order items and add them to your display inventory.
+            Use search and filters to find items quickly.
           </p>
         </div>
 
@@ -101,24 +152,48 @@ export default function AdminDisplayProduct() {
             <table className="w-full text-sm">
               <thead className="bg-gradient-to-r from-orange-50 to-pink-50">
                 <tr>
-                  <th className="text-left px-6 py-5 font-bold text-gray-700">Purchase ID</th>
-                  <th className="text-left px-6 py-5 font-bold text-gray-700">Supplier</th>
-                  <th className="text-left px-6 py-5 font-bold text-gray-700">Product</th>
-                  <th className="text-center px-6 py-5 font-bold text-gray-700">Unit Cost</th>
-                  <th className="text-center px-6 py-5 font-bold text-gray-700">Order Date</th>
-                  <th className="text-center px-6 py-5 font-bold text-gray-700">Contact</th>
-                  <th className="text-center px-6 py-5 font-bold text-gray-700">Action</th>
+                  <th className="text-left px-6 py-5 font-bold text-gray-700">
+                    Purchase ID
+                  </th>
+                  <th className="text-left px-6 py-5 font-bold text-gray-700">
+                    Supplier
+                  </th>
+                  <th className="text-left px-6 py-5 font-bold text-gray-700">
+                    Product
+                  </th>
+                  <th className="text-center px-6 py-5 font-bold text-gray-700">
+                    Unit Cost
+                  </th>
+                  <th className="text-center px-6 py-5 font-bold text-gray-700">
+                    Order Date
+                  </th>
+                  <th className="text-center px-6 py-5 font-bold text-gray-700">
+                    Contact
+                  </th>
+                  <th className="text-center px-6 py-5 font-bold text-gray-700">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginated.map((item) => (
                   <tr key={item.id} className="hover:bg-orange-50 transition">
-                    <td className="px-6 py-4 font-bold text-orange-700">{item.id}</td>
+                    <td className="px-6 py-4 font-bold text-orange-700">
+                      {item.id}
+                    </td>
                     <td className="px-6 py-4">{item.supplier}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{item.product}</td>
-                    <td className="px-6 py-4 text-center">₱{item.unitCost.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-center text-gray-600">{item.orderDate}</td>
-                    <td className="px-6 py-4 text-center text-gray-600">{item.contact}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {item.product}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      ₱{item.unitCost.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 text-center text-gray-600">
+                      {item.orderDate}
+                    </td>
+                    <td className="px-6 py-4 text-center text-gray-600">
+                      {item.contact}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-3">
                         <button className="px-5 py-2 rounded-lg text-white font-semibold text-xs bg-gradient-to-r from-[#FFD873] to-[#FF9B52] shadow-sm hover:brightness-110 transition">
@@ -139,7 +214,7 @@ export default function AdminDisplayProduct() {
           <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-5 border-t border-gray-200 gap-4">
             <div className="flex items-center gap-3 text-sm">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50 transition"
               >
@@ -149,7 +224,9 @@ export default function AdminDisplayProduct() {
                 Page {currentPage} of {totalPages || 1}
               </span>
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50 transition"
               >

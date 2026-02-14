@@ -1,7 +1,8 @@
 import { Bell, Search, Printer } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import CustomerLayout from "../../layout/staffLayout";
+import React from "react";
+import StaffLayout from "../../layout/staffLayout";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -37,7 +38,7 @@ export default function StaffPOS() {
   // ---------------- Cart Calculations ----------------
   const subtotal = cart.reduce(
     (sum, item) => sum + item.unit_price * item.quantity,
-    0
+    0,
   );
   const VAT_RATE = 0.12;
   const vat = subtotal * VAT_RATE;
@@ -47,15 +48,15 @@ export default function StaffPOS() {
   // ---------------- Cart Helpers ----------------
   const addToCart = (item, type) => {
     const existing = cart.find(
-      (i) => i.id === (item.serviceid || item.productid) && i.type === type
+      (i) => i.id === (item.serviceid || item.productid) && i.type === type,
     );
     if (existing) {
       setCart(
         cart.map((i) =>
           i.id === (item.serviceid || item.productid) && i.type === type
             ? { ...i, quantity: i.quantity + 1 }
-            : i
-        )
+            : i,
+        ),
       );
     } else {
       setCart([
@@ -82,7 +83,7 @@ export default function StaffPOS() {
           }
           return item;
         })
-        .filter(Boolean)
+        .filter(Boolean),
     );
   };
 
@@ -167,8 +168,8 @@ export default function StaffPOS() {
 
       alert(
         `Payment Successful!\nOrder ID: ${orderId}\nChange: ₱${change.toFixed(
-          2
-        )}`
+          2,
+        )}`,
       );
 
       // Print receipt after payment
@@ -182,7 +183,7 @@ export default function StaffPOS() {
 
   // ---------------- RENDER ----------------
   return (
-    <CustomerLayout>
+    <StaffLayout>
       <div className="min-h-screen bg-gradient-to-b from-orange-50 to-pink-50 flex flex-col">
         {/* MAIN */}
         <main className="flex-1 px-6 py-8 max-w-7xl mx-auto w-full">
@@ -207,7 +208,6 @@ export default function StaffPOS() {
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[...services, ...products]
                   .filter((item) => {
@@ -223,13 +223,11 @@ export default function StaffPOS() {
                     const image = item.prodimage
                       ? `${API_BASE}/${item.prodimage}`
                       : null;
-
                     const added = cart.reduce((acc, i) => {
                       if (i.id === (item.serviceid || item.productid))
                         return i.quantity;
                       return acc;
                     }, 0);
-
                     return (
                       <div
                         key={`${type}-${item.serviceid || item.productid}`}
@@ -265,7 +263,6 @@ export default function StaffPOS() {
                   })}
               </div>
             </div>
-
             {/* RIGHT: Cart/Receipt */}
             <div className="bg-gray-50 rounded-2xl p-5 flex flex-col h-full overflow-y-auto">
               {/* RECEIPT */}
@@ -275,7 +272,7 @@ export default function StaffPOS() {
               >
                 <div className="text-center mb-4">
                   <img
-                    src="/honeydolls.png"
+                    src="/src/assets/honeydolls.jpg"
                     alt="Honey Dolls"
                     className="w-16 h-16 mx-auto rounded-full object-cover mb-2"
                   />
@@ -286,9 +283,7 @@ export default function StaffPOS() {
                     <span className="font-medium">{referenceCode}</span>
                   </p>
                 </div>
-
                 <hr className="border-gray-300 my-2" />
-
                 <div className="space-y-2 mb-2">
                   {cart.length === 0 ? (
                     <p className="text-center text-gray-500 text-sm py-4">
@@ -312,9 +307,7 @@ export default function StaffPOS() {
                     ))
                   )}
                 </div>
-
                 <hr className="border-gray-300 my-2" />
-
                 <div className="text-sm space-y-1">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
@@ -329,9 +322,7 @@ export default function StaffPOS() {
                     <span>₱{total.toFixed(2)}</span>
                   </div>
                 </div>
-
                 <hr className="border-gray-300 my-2" />
-
                 <div className="text-sm space-y-1">
                   <div className="flex justify-between">
                     <span>Amount Paid</span>
@@ -342,23 +333,18 @@ export default function StaffPOS() {
                     <span>₱{change.toFixed(2)}</span>
                   </div>
                 </div>
-
                 <hr className="border-gray-300 my-2" />
-
                 <div className="text-sm">
                   <p>
                     Payment Method:{" "}
                     <span className="font-medium">{paymentMethod}</span>
                   </p>
                 </div>
-
                 <hr className="border-gray-300 my-2" />
-
                 <div className="text-center text-xs text-gray-500 mt-2">
                   Thank you for visiting Honey Dolls & Brilliant!
                 </div>
               </div>
-
               {/* AMOUNT PAID INPUT */}
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -396,7 +382,6 @@ export default function StaffPOS() {
                   ))}
                 </div>
               </div>
-
               {/* BUTTONS */}
               <div className="space-y-3 mt-4">
                 <button
@@ -406,14 +391,12 @@ export default function StaffPOS() {
                 >
                   Confirm & Pay
                 </button>
-
                 <button
                   onClick={printReceipt}
                   className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition font-medium text-sm"
                 >
                   <Printer className="w-4 h-4" /> Print Receipt
                 </button>
-
                 <button
                   onClick={clearCart}
                   className="w-full border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition font-medium text-sm"
@@ -425,6 +408,6 @@ export default function StaffPOS() {
           </div>
         </main>
       </div>
-    </CustomerLayout>
+    </StaffLayout>
   );
 }

@@ -10,6 +10,7 @@ import {
 import AdminLayout from "../layout/adminLayout";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import React from "react";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -58,7 +59,7 @@ export default function ProductDisplay() {
     .filter(
       (item) =>
         item.prodname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.prodcat.toLowerCase().includes(searchTerm.toLowerCase())
+        item.prodcat.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     .sort((a, b) => {
       if (sortOrder === "created-desc")
@@ -71,7 +72,7 @@ export default function ProductDisplay() {
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginated = filtered.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   // Image Upload
@@ -98,13 +99,13 @@ export default function ProductDisplay() {
         const { data } = await axios.put(
           `${API_BASE}/products/${editProduct.productid}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
 
         setProducts((prev) =>
           prev.map((p) =>
-            p.productid === data.product.productid ? data.product : p
-          )
+            p.productid === data.product.productid ? data.product : p,
+          ),
         );
       } else {
         // CREATE PRODUCT
