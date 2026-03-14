@@ -1,0 +1,488 @@
+Step 1: Set up the repo terminal
+
+Run these first:
+//
+git clone https://github.com/STI-WEB-DEVS/server.git
+cd server
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve
+///
+That matches the setup steps you were given.
+
+Step 2: Create model + migration files
+
+Make these:
+//
+php artisan make:model Customer -m
+php artisan make:model Product -m
+php artisan make:model Order -m
+php artisan make:model OrderItem -m
+///
+Then generate the API layers:
+//
+php artisan make:api-layer Customer
+php artisan make:api-layer Product
+php artisan make:api-layer Order
+///
+Your scaffold command is meant to create the API stack for an entity, so this saves time for controller/service/repository/resource creation.
+
+Step 3: Migrations
+database/migrations/create_customers_table.php
+customers table
+//
+Schema::create('customers', function (Blueprint $table) {
+    $table->id();
+    $table->uuid('uuid')->unique();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->string('phone')->nullable();
+    $table->timestamps();
+    $table->softDeletes();
+});
+///
+
+products table
+//
+Schema::create('products', function (Blueprint $table) {
+    $table->id();
+    $table->uuid('uuid')->unique();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->decimal('price', 10, 2);
+    $table->integer('stock')->default(0);
+    $table->timestamps();
+    $table->softDeletes();
+});
+///
+orders table
+//
+Schema::create('orders', function (Blueprint $table) {
+    $table->id();
+    $table->uuid('uuid')->unique();
+    $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
+    $table->decimal('total_amount', 10, 2)->default(0);
+    $table->string('status')->default('pending');
+    $table->timestamps();
+    $table->softDeletes();
+});
+///
+order_items table
+//
+Schema::create('order_items', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+    $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+    $table->integer('quantity');
+    $table->decimal('price', 10, 2);
+    $table->decimal('subtotal', 10, 2);
+    $table->timestamps();
+});
+///
+
+Then run:
+//
+php artisan migrate
+///
+Step 4: Models
+app/Models/Customer.php
+//
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class Customer extends Model
+{
+    use SoftDeletes, HasUuids;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+    ];
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+}
+///
+app/Models/Product.php
+//
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class Product extends Model
+{
+    use SoftDeletes, HasUuids;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'stock',
+    ];
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+}
+///
+app/Models/Order.php
+//
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class Order extends Model
+{
+    use SoftDeletes, HasUuids;
+
+    protected $fillable = [
+        'customer_id',
+        'total_amount',
+        'status',
+    ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+}
+///
+app/Models/OrderItem.php
+//
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class OrderItem extends Model
+{
+    protected $fillable = [
+        'order_id',
+        'product_id',
+        'quantity',
+        'price',
+        'subtotal',
+    ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+///
+Step 5: Validation
+
+This is one of your requirements, so validate in the controller before passing data to the service.
+
+CustomerController@store
+app
+ └ Http
+     └ Controllers
+//
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:customers,email',
+        'phone' => 'nullable|string|max:20',
+    ]);
+
+    return $this->customerService->createCustomer($validated);
+}
+///
+ProductController@store
+//
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'price' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+    ]);
+
+    return $this->productService->createProduct($validated);
+}
+///
+OrderController@store
+//
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'customer_id' => 'required|exists:customers,id',
+        'items' => 'required|array|min:1',
+        'items.*.product_id' => 'required|exists:products,id',
+        'items.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    return $this->orderService->createOrder($validated);
+}
+///
+Step 6: Payload design
+
+This is another requirement.
+Your request bodies should look like this:
+POSTMAN OR THUNDERCLIENT
+
+Create customer
+
+{
+  "name": "Jake Escalada",
+  "email": "jake@example.com",
+  "phone": "09123456789"
+}
+Create product
+{
+  "name": "Mouse",
+  "description": "Wireless mouse",
+  "price": 599.00,
+  "stock": 20
+}
+Create order
+{
+  "customer_id": 1,
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    },
+    {
+      "product_id": 2,
+      "quantity": 1
+    }
+  ]
+}
+
+That is a good payload design because order data is separated into:
+
+order header: customer_id
+
+order details: items
+
+Step 7: Repository injection
+
+
+Example OrderService.php
+
+app/Service/OrderService.php
+
+//
+<?php
+
+namespace App\Service;
+
+use App\Http\Resources\OrderResource;
+use App\Repository\OrderRepository;
+use App\Models\Product;
+use Illuminate\Support\Facades\DB;
+
+class OrderService
+{
+    protected $orderRepository;
+
+    public function __construct(OrderRepository $orderRepository)
+    {
+        $this->orderRepository = $orderRepository;
+    }
+
+    public function createOrder(array $payload)
+    {
+        return DB::transaction(function () use ($payload) {
+            $total = 0;
+            $itemsData = [];
+
+            foreach ($payload['items'] as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $subtotal = $product->price * $item['quantity'];
+                $total += $subtotal;
+
+                $itemsData[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            $order = $this->orderRepository->create([
+                'customer_id' => $payload['customer_id'],
+                'total_amount' => $total,
+                'status' => 'pending',
+            ]);
+
+            foreach ($itemsData as $item) {
+                $order->items()->create($item);
+            }
+
+            $order->load(['customer', 'items.product']);
+
+            return new OrderResource($order);
+        });
+    }
+
+    public function listOrdersPerCustomer(int $customerId)
+    {
+        $orders = $this->orderRepository->findByCustomer($customerId);
+        return OrderResource::collection($orders);
+    }
+}
+///
+Example OrderRepository.php
+
+app/Repository/OrderRepository.php
+
+//
+<?php
+
+namespace App\Repository;
+
+use App\Models\Order;
+
+class OrderRepository
+{
+    public function create(array $payload)
+    {
+        return Order::create($payload);
+    }
+
+    public function findByCustomer(int $customerId)
+    {
+        return Order::with(['customer', 'items.product'])
+            ->where('customer_id', $customerId)
+            ->latest()
+            ->paginate(15);
+    }
+}
+///
+Step 8: Resources
+OrderResource.php
+
+app/Http/Resources/OrderResource.php
+
+//
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class OrderResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
+            'customer' => [
+                'id' => $this->customer?->id,
+                'name' => $this->customer?->name,
+                'email' => $this->customer?->email,
+            ],
+            'total_amount' => $this->total_amount,
+            'status' => $this->status,
+            'items' => $this->items->map(function ($item) {
+                return [
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product?->name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'subtotal' => $item->subtotal,
+                ];
+            }),
+            'created_at' => $this->created_at,
+        ];
+    }
+}
+///
+You can do simpler resources for CustomerResource and ProductResource.
+
+Step 9: Routes
+
+routes/api.php
+
+Example for routes/api.php:
+//
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use Illuminate\Support\Facades\Route;
+
+Route::apiResources([
+    'customers' => CustomerController::class,
+    'products' => ProductController::class,
+    'orders' => OrderController::class,
+]);
+
+Route::get('customers/{customer}/orders', [OrderController::class, 'ordersPerCustomer']);
+///
+
+Then in OrderController:
+
+class OrderController extends Controller
+
+app
+ └ Http
+     └ Controllers
+         └ OrderController.php
+
+//
+{
+    protected $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
+    public function ordersPerCustomer(int $customerId)
+    {
+        return $this->orderService->listOrdersPerCustomer($customerId);
+    }
+}
+///
+Step 10: What to submit / show
+
+Your output says:
+
+1. Product/Customer creation
+
+Test these endpoints:
+
+POST /api/customers
+POST /api/products
+2. Order creation
+POST /api/orders
+3. Order list per customer
+GET /api/customers/1/orders
